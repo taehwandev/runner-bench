@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#050714" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>NEON RUSH // Nightline Runner</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050714'/%3E%3Cpath d='M14 48 L32 12 L50 48 L38 48 L32 34 L26 48 Z' fill='%2300f0ff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23ff1e8a'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script>
+    // Expose automated check state immediately at page load
+    window.__game = {
+      state: 'start',
+      score: 0,
+      combo: 1,
+      alive: false
+    };
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <canvas id="game-canvas" aria-label="Neon Rush 3D Endless Runner"></canvas>
+
+    <!-- 2D Speed Lines & Screen Vignette FX -->
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+    <div id="damage-flash" aria-hidden="true"></div>
+
+    <!-- Active Gameplay HUD -->
+    <header id="hud" class="hidden" aria-live="polite">
+      <div class="hud-top">
+        <div class="hud-score-block">
+          <div class="hud-label">SCORE</div>
+          <div id="hud-score" class="hud-score-value">0</div>
+          <div class="hud-subrow">
+            <span id="hud-distance">0m</span>
+            <span class="hud-dot">•</span>
+            <span id="hud-speed">75 km/h</span>
+          </div>
+        </div>
+
+        <div class="hud-right-stack">
+          <div class="hud-top-actions">
+            <div class="hud-best-pill">
+              <span class="hud-best-label">BEST</span>
+              <span id="hud-best">0</span>
+            </div>
+            <button id="btn-mute" class="icon-btn" type="button" aria-label="Toggle Sound" title="Toggle Sound (M)">
+              <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+              <svg id="icon-sound-off" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <line x1="23" y1="9" x2="17" y2="15"></line>
+                <line x1="17" y1="9" x2="23" y2="15"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div id="combo-card" class="combo-card">
+            <div class="combo-row">
+              <span class="combo-label">COMBO</span>
+              <span id="hud-combo" class="combo-value">x1</span>
+            </div>
+            <div class="combo-bar-track">
+              <div id="hud-combo-fill" class="combo-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- District Banner -->
+      <div id="district-banner" class="district-banner hidden">
+        <span class="district-tag">SECTOR</span>
+        <span id="district-name">SHIBUYA NEON CORE</span>
+      </div>
+
+      <!-- Active Power-Up Timers -->
+      <div id="powerup-rack" class="powerup-rack"></div>
+
+      <!-- Floating Action Callouts (Near Miss, Smash, Powerup) -->
+      <div id="callout-layer" class="callout-layer" aria-hidden="true"></div>
+    </header>
+
+    <!-- Start Screen Overlay -->
+    <section id="start-screen" class="overlay-screen active">
+      <div class="screen-card start-card">
+        <div class="brand-kicker">MIDNIGHT EXPRESSWAY // SECTOR 09</div>
+        <h1 class="game-title">
+          <span class="title-neon-cyan">NEON</span>
+          <span class="title-neon-pink">RUSH</span>
+        </h1>
+        <p class="game-subtitle">Weave traffic, graze bumper-to-bumper for combos, and own the rain-slicked nightline.</p>
+
+        <div class="start-best-banner">
+          <span class="best-crown">HIGH SCORE</span>
+          <span id="start-best-score" class="best-number">0</span>
+        </div>
+
+        <div class="controls-panel" aria-label="Controls Guide">
+          <div class="controls-heading">CONTROLS</div>
+          <div class="controls-grid">
+            <div class="control-item">
+              <div class="gesture-badge">
+                <span class="arrow-glyph">←</span>
+                <span class="arrow-sep">/</span>
+                <span class="arrow-glyph">→</span>
+              </div>
+              <div class="control-text">
+                <strong>Swipe L / R</strong>
+                <span>Switch Lane</span>
+              </div>
+            </div>
+            <div class="control-item">
+              <div class="gesture-badge">
+                <span class="arrow-glyph">↑</span>
+              </div>
+              <div class="control-text">
+                <strong>Swipe Up</strong>
+                <span>Jump Barriers</span>
+              </div>
+            </div>
+            <div class="control-item">
+              <div class="gesture-badge">
+                <span class="arrow-glyph">↓</span>
+              </div>
+              <div class="control-text">
+                <strong>Swipe Down</strong>
+                <span>Slide / Air-Slam</span>
+              </div>
+            </div>
+            <div class="control-item">
+              <div class="gesture-badge key-badge">
+                <span>WASD / ↑↓←→</span>
+              </div>
+              <div class="control-text">
+                <strong>Keyboard</strong>
+                <span>Secondary Input</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="powerup-legend">
+            <span class="pu-chip pu-shield">● Shield</span>
+            <span class="pu-chip pu-magnet">● Magnet</span>
+            <span class="pu-chip pu-dash">● Nitro Dash</span>
+            <span class="pu-chip pu-chrono">● Slow-Time</span>
+          </div>
+        </div>
+
+        <button id="btn-start" class="cta-btn" type="button">
+          <span class="cta-main">TAP TO RUN</span>
+          <span class="cta-sub">OR PRESS SPACE</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Game Over Screen Overlay -->
+    <section id="gameover-screen" class="overlay-screen hidden">
+      <div class="screen-card gameover-card">
+        <div id="new-best-badge" class="new-best-badge hidden">NEW RECORD</div>
+        <div class="gameover-kicker">SIGNAL LOST // WIPEOUT</div>
+        <h2 class="gameover-title">RUN TERMINATED</h2>
+
+        <div class="score-summary">
+          <div class="final-score-box">
+            <span class="summary-label">FINAL SCORE</span>
+            <span id="final-score" class="final-score-number">0</span>
+          </div>
+          <div class="best-score-box">
+            <span class="summary-label">BEST SCORE</span>
+            <span id="final-best" class="best-score-number">0</span>
+          </div>
+        </div>
+
+        <div class="stats-strip">
+          <div class="stat-cell">
+            <span id="stat-distance" class="stat-val">0m</span>
+            <span class="stat-lbl">DISTANCE</span>
+          </div>
+          <div class="stat-cell">
+            <span id="stat-combo" class="stat-val">x1</span>
+            <span class="stat-lbl">MAX COMBO</span>
+          </div>
+          <div class="stat-cell">
+            <span id="stat-nearmiss" class="stat-val">0</span>
+            <span class="stat-lbl">NEAR MISS</span>
+          </div>
+          <div class="stat-cell">
+            <span id="stat-shards" class="stat-val">0</span>
+            <span class="stat-lbl">SHARDS</span>
+          </div>
+        </div>
+
+        <button id="btn-restart" class="cta-btn restart-btn" type="button">
+          <span class="cta-main">TAP TO RESTART</span>
+          <span class="cta-sub">INSTANT RELAUNCH</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

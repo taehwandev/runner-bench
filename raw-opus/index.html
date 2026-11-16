@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0418" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>NEON NIGHTRUN</title>
+<link rel="stylesheet" href="style.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="c"></canvas>
+
+  <!-- In-game HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="hud-left">
+        <div id="score" class="score">0</div>
+        <div id="dist" class="sub">0 m</div>
+      </div>
+      <div class="hud-right">
+        <div id="combo" class="combo dim">
+          <div class="combo-mult">x<span id="comboMult">1</span></div>
+          <div class="combo-bar"><i id="comboBar"></i></div>
+          <div class="combo-label" id="comboLabel">CHAIN 0</div>
+        </div>
+        <div id="coins" class="sub coins"><b class="chip"></b><span id="coinCount">0</span></div>
+      </div>
+    </div>
+    <div id="powers" class="powers"></div>
+    <div id="popups" class="popups"></div>
+    <div id="banner" class="banner"><small>ENTERING</small><span id="bannerText">NEON CORE</span></div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="start" class="screen">
+    <div class="title-wrap">
+      <div class="title-kicker">— a night city run —</div>
+      <h1 class="title"><span class="t1">NEON</span><span class="t2">NIGHTRUN</span></h1>
+    </div>
+    <div class="controls">
+      <div class="ctl"><div class="gesture g-lr"><i></i></div><div><b>SWIPE ← →</b><span>change lane</span></div></div>
+      <div class="ctl"><div class="gesture g-up"><i></i></div><div><b>SWIPE ↑</b><span>jump barriers</span></div></div>
+      <div class="ctl"><div class="gesture g-dn"><i></i></div><div><b>SWIPE ↓</b><span>slide under beams</span></div></div>
+      <div class="tips">
+        <p><em class="c1">NEAR MISSES</em> &amp; <em class="c2">RISKY GEMS</em> build your multiplier.</p>
+        <p class="pw"><span class="pu pu-shield">◈ SHIELD</span><span class="pu pu-magnet">∩ MAGNET</span><span class="pu pu-drive">» OVERDRIVE</span></p>
+        <p class="kbd">Keyboard: ← → ↑ ↓ / WASD · Space</p>
+      </div>
+    </div>
+    <div class="best-line">BEST <span id="bestStart">0</span></div>
+    <div class="tap pulse">TAP TO RUN</div>
+  </div>
+
+  <!-- Game over -->
+  <div id="over" class="screen hidden">
+    <div class="over-title">WRECKED</div>
+    <div class="over-score" id="overScore">0</div>
+    <div class="newbest hidden" id="newBest">NEW BEST!</div>
+    <div class="over-best">BEST <span id="overBest">0</span></div>
+    <div class="stats">
+      <div><b id="stDist">0</b><span>meters</span></div>
+      <div><b id="stNear">0</b><span>near misses</span></div>
+      <div><b id="stCoins">0</b><span>chips</span></div>
+      <div><b id="stCombo">x1</b><span>top multiplier</span></div>
+    </div>
+    <div class="tap pulse" id="retry">TAP TO RUN AGAIN</div>
+  </div>
+
+  <div id="pause" class="screen hidden"><div class="tap pulse">PAUSED — TAP TO RESUME</div></div>
+  <div id="flash"></div>
+  <div id="rotate"><div>↻</div>Turn your phone upright<br><small>NEON NIGHTRUN is played in portrait</small></div>
+  <div id="loading">BOOTING CITY GRID…</div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

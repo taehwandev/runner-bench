@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#080c1b"><meta name="mobile-web-app-capable" content="yes">
+<title>AFTERHOURS — Neon courier</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080c1b'/%3E%3Cpath d='M36 7 14 36h17l-3 21 23-31H34z' fill='%2365ffe5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+<main id="app">
+<div id="scene" aria-label="3D neon city runner"></div>
+<div class="vignette"></div><div id="flash"></div>
+<header id="hud"><div class="score-block"><span class="eyebrow">NIGHT SHIFT / <b id="district">01</b></span><strong id="score">000000</strong><span id="distance">0 M</span></div><div class="hud-right"><button id="sound" aria-label="Mute sound">♫</button><button id="pause" aria-label="Pause game">Ⅱ</button><div id="combo">×1<span>COMBO</span></div></div></header>
+<div id="districtTag"><span class="signal"></span><span id="districtName">SHIBUYA / ELECTRIC QUARTER</span></div>
+<div id="powers"></div><div id="notice" aria-live="polite"></div>
+<section id="start" class="screen">
+<div class="brand"><div class="edition"><span class="signal"></span> MIDNIGHT DELIVERY CLUB <span>001 / ∞</span></div><h1>AFTER<br><em>HOURS</em><span class="title-dot">®</span></h1><p>THE CITY NEVER STOPS. NEITHER DO YOU.</p></div>
+<div class="start-bottom"><div class="mission"><span class="mission-number">01</span><div><b>OWN THE NIGHT.</b><p>Ride the risk. Chase the glow.</p></div><span class="arrow">↗</span></div><div class="controls"><div><i>↔</i><span>CHANGE LANE</span></div><div><i>↑</i><span>JUMP</span></div><div><i>↓</i><span>SLIDE</span></div></div><button id="play" class="primary"><span>LET’S RUN</span><span>→</span></button><div class="footnote"><span>SWIPE TO MOVE · ARROWS / WASD</span><span id="startBest">BEST 0</span></div><p id="loadStatus">CONNECTING TO THE CITY…</p></div>
+</section>
+<section id="end" class="screen hidden"><div class="result-panel"><span class="eyebrow">SHIFT COMPLETE</span><h2>ONE MORE<br><em>BLOCK?</em></h2><p id="endReason">The city caught up.</p><div class="result-score"><span>YOUR SCORE</span><strong id="finalScore">0</strong></div><div class="result-stats"><div><span>PERSONAL BEST</span><b id="bestScore">0</b></div><div><span>DISTANCE</span><b id="finalDistance">0 M</b></div><div><span>NEON COLLECTED</span><b id="finalCoins">0</b></div></div><button id="restart" class="primary"><span>RUN IT BACK</span><span>↻</span></button><p class="restart-note">TAP ANYWHERE TO RESTART</p></div></section>
+<section id="paused" class="screen hidden"><div class="result-panel"><span class="eyebrow">TAKE A BREATH</span><h2>CITY<br><em>ON HOLD.</em></h2><button id="resume" class="primary"><span>KEEP RUNNING</span><span>→</span></button></div></section>
+<div id="bottomHint">STAY CLOSE. SCORE BIG.</div>
+</main>
+<script type="module" src="game.js"></script>
+</body></html>
