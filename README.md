@@ -16,5 +16,4 @@ Only Opus reported a cost. Token counters differ per CLI, so do not compare them
 
 Play: swipe on a phone (left/right lanes, up jump, down slide), or ← → ↑ ↓ / A D W S / Space on a keyboard. Needs internet for Three.js.
 
-Live: https://taehwandev.github.io/runner-bench/<folder>/ (for example `moru-opus/`).
-Showcase page: https://getmoru.com/runner
+Play them on the showcase page: https://getmoru.com/runner
