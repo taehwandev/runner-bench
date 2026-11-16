@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Interactive 3D rocket launch: countdown, ignition, liftoff and a camera that follows the rocket into the distance." />
+  <title>Rocket Launch · Interactive 3D</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="scene" aria-label="3D view of a rocket on a launch pad. Drag to orbit, scroll or pinch to zoom."></canvas>
+
+  <div class="overlay">
+    <header class="hud-top">
+      <div class="brand panel">
+        <h1>Launch Pad</h1>
+        <p>Interactive 3D launch</p>
+        <div id="mission-hud" class="mission-hud" aria-label="Mission status">
+          <div class="fuel">
+            <span class="fuel-label">Propellant</span>
+            <div id="fuel-bar" class="fuel-bar" role="meter" aria-label="Propellant remaining" aria-valuemin="0" aria-valuemax="80" aria-valuenow="80">
+              <span id="fuel-fill" class="fuel-fill"></span>
+            </div>
+            <span id="fuel-text" class="fuel-text">80 / 80</span>
+          </div>
+          <p class="mission-score"><span class="fuel-label">Score</span> <strong id="mission-score">0</strong></p>
+        </div>
+      </div>
+      <dl class="telemetry panel" aria-label="Telemetry">
+        <div>
+          <dt>Status</dt>
+          <dd id="status">Ready</dd>
+        </div>
+        <div>
+          <dt>Mission time</dt>
+          <dd id="met">—</dd>
+        </div>
+        <div>
+          <dt>Altitude</dt>
+          <dd id="alt">0 m</dd>
+        </div>
+        <div>
+          <dt>Speed</dt>
+          <dd id="speed">0 m/s</dd>
+        </div>
+      </dl>
+    </header>
+
+    <div id="recovery-banner" class="recovery-banner hidden" role="status">
+      <div class="banner-content">
+        <span class="banner-icon">🎯</span>
+        <div class="banner-text">
+          <strong>Booster Recovered!</strong>
+          <p id="recovery-desc">First stage landed upright on Pad LZ-1.</p>
+        </div>
+        <button id="relaunch-btn" class="btn primary" type="button">Launch Recovered Rocket</button>
+      </div>
+    </div>
+
+    <aside id="booster-pip" class="booster-pip hidden" aria-label="Booster Return Camera">
+      <div class="pip-header">
+        <span class="pip-badge">● LIVE</span>
+        <span id="pip-title" class="pip-title">STAGE 1 CAMERA</span>
+        <button id="pip-swap" class="pip-btn" type="button" title="Switch view">⤢ Switch view</button>
+      </div>
+      <div class="pip-frame-view">
+        <span class="pip-crosshair"></span>
+      </div>
+      <div class="pip-footer">
+        <span id="pip-status">Braking burn</span>
+        <span id="pip-alt">0 m</span>
+        <span id="pip-speed">0 m/s</span>
+      </div>
+    </aside>
+
+    <div id="countdown" class="countdown hidden" aria-live="assertive"></div>
+
+    <section id="decision" class="decision panel hidden" aria-labelledby="decision-title" aria-live="polite">
+      <p id="decision-step" class="decision-step"></p>
+      <h2 id="decision-title" class="decision-title"></h2>
+      <p id="decision-prompt" class="decision-prompt"></p>
+      <div id="decision-options" class="decision-options"></div>
+      <p class="decision-foot">The flight waits for your choice. Press 1, 2 or 3.</p>
+    </section>
+
+    <section id="result" class="result panel hidden" aria-labelledby="result-title" role="status">
+      <h2 id="result-title" class="result-title"></h2>
+      <p id="result-reason" class="result-reason"></p>
+      <dl id="result-breakdown" class="result-breakdown"></dl>
+      <button id="restart-btn" class="btn primary" type="button">Retry mission</button>
+      <p id="restart-note" class="restart-note"></p>
+    </section>
+
+    <div class="controls">
+      <button id="launch" class="btn primary" type="button">Launch</button>
+      <div class="mission-controls" role="group" aria-label="Game options">
+        <button id="mode-btn" class="btn" type="button" aria-pressed="true">Mode: Mission</button>
+        <button id="autopilot-btn" class="btn" type="button" aria-pressed="false">Autopilot: off</button>
+      </div>
+      <div class="cam-controls" role="group" aria-label="Playback and camera controls">
+        <button id="pause" class="btn" type="button" disabled>Pause</button>
+        <button id="follow" class="btn" type="button" aria-pressed="true">Follow rocket</button>
+        <button id="follow-booster" class="btn hidden" type="button" aria-pressed="false">Follow booster</button>
+        <button id="zoom-in" class="btn" type="button">Zoom in</button>
+        <button id="zoom-out" class="btn" type="button">Zoom out</button>
+        <button id="reset-cam" class="btn" type="button">Reset camera</button>
+      </div>
+      <p class="hint panel">
+        <span class="hint-desktop">Drag to orbit · Scroll to zoom · Space to launch / relaunch · R to reset camera · B to track booster · M mode · A autopilot · 1–3 choose</span>
+        <span class="hint-touch">Drag to orbit · Pinch to zoom · Tap Launch · Tap PiP to track booster · Tap a decision</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="no-webgl-message panel" role="alert">
+    <h1>WebGL is not available</h1>
+    <p>This page needs WebGL to draw the 3D scene. Try a current browser with hardware acceleration turned on.</p>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

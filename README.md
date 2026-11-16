@@ -17,3 +17,15 @@ Only Opus reported a cost. Token counters differ per CLI, so do not compare them
 Play: swipe on a phone (left/right lanes, up jump, down slide), or ← → ↑ ↓ / A D W S / Space on a keyboard. Needs internet for Three.js.
 
 Play them on the showcase page: https://getmoru.com/runner
+
+## rocket/
+
+Twenty builds from the earlier browser 3D rocket test, kept as the models left them (only tool state such as `.moru`, `.git` and `tests/` was left out). Ten stages, each built once with Moru (`-on`) and once without (`-off`), switching models between stages: stages 1-5 are a rocket launch scene and stages 6-10 add a Moon round trip, booster reuse and game elements.
+
+| Stage | Model |
+|---|---|
+| 1, 4, 6, 9 | Claude Haiku |
+| 2, 5, 7, 10 | GPT-6.1 Terra |
+| 3, 8 | Gemini |
+
+Folders are named `rocket/stage<N>-<model>-<on|off>/`. Each has an `index.html`; Three.js loads from a CDN. One run per cell, so treat the results as a reference.

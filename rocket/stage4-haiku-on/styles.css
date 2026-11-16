@@ -1,0 +1,487 @@
+:root {
+  --panel: rgba(9, 18, 32, 0.6);
+  --panel-line: rgba(255, 255, 255, 0.18);
+  --text: #f4f8ff;
+  --muted: #c9d9ec;
+  --accent: #ff7a2e;
+  --accent-deep: #ff4426;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #cfe8ff;
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none; /* let OrbitControls own drags and pinches */
+  outline: none;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none; /* only real controls take pointer input; the scene underneath keeps it */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+
+body.ready .overlay {
+  opacity: 1;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(5, 15, 30, 0.25);
+}
+
+/* ---------- Top bar ---------- */
+.hud-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.brand {
+  padding: 10px 14px;
+  min-width: 0;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.brand p {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.telemetry {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 8px 22px;
+  padding: 10px 16px;
+}
+
+.telemetry div {
+  min-width: 0;
+}
+
+.telemetry dt {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.telemetry dd {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Countdown ---------- */
+.countdown {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(3.5rem, 15vw, 9rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.35), 0 0 2px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.countdown.hidden {
+  display: none;
+}
+
+.countdown.tick {
+  animation: tick 0.9s ease-out both;
+}
+
+@keyframes tick {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ---------- Bottom controls ---------- */
+.controls {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.controls > * {
+  pointer-events: auto;
+}
+
+.cam-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 560px;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--panel-line);
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.12s ease, background 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: rgba(22, 40, 66, 0.78);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible {
+  outline: 3px solid #ffd27a;
+  outline-offset: 3px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.btn.primary {
+  min-width: 220px;
+  min-height: 54px;
+  padding: 0 32px;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  border: none;
+  background: linear-gradient(135deg, #ffa033, var(--accent) 45%, var(--accent-deep));
+  box-shadow: 0 10px 30px rgba(255, 90, 40, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffb048, #ff8a3a 45%, #ff5530);
+  filter: brightness(1.05);
+}
+
+.btn.primary:disabled {
+  background: linear-gradient(135deg, #7d8798, #566173);
+  box-shadow: none;
+  opacity: 0.85;
+}
+
+.hint {
+  margin: 0;
+  padding: 7px 14px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: center;
+  max-width: 100%;
+}
+
+.hint-touch {
+  display: none;
+}
+
+/* ---------- Fallback ---------- */
+.no-webgl-message {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 420px);
+  padding: 20px;
+  text-align: center;
+}
+
+body.no-webgl .no-webgl-message {
+  display: block;
+}
+
+body.no-webgl .overlay {
+  display: none;
+}
+
+.no-webgl-message h1 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.no-webgl-message p {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* ---------- Touch and small screens ---------- */
+@media (pointer: coarse) {
+  .hint-desktop {
+    display: none;
+  }
+
+  .hint-touch {
+    display: inline;
+  }
+}
+
+@media (max-width: 720px) {
+  .brand p {
+    display: none;
+  }
+
+  .telemetry {
+    grid-template-columns: repeat(2, auto);
+    gap: 8px 18px;
+    padding: 8px 12px;
+  }
+
+  .telemetry dd {
+    font-size: 0.88rem;
+  }
+
+  .btn {
+    font-size: 0.86rem;
+    padding: 0 12px;
+  }
+
+  .btn.primary {
+    width: 100%;
+    max-width: 320px;
+    min-width: 0;
+  }
+
+  .cam-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .hint {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    padding: 8px 12px;
+  }
+
+  .telemetry {
+    gap: 6px 12px;
+  }
+
+  .telemetry dt {
+    font-size: 0.6rem;
+  }
+
+  .telemetry dd {
+    font-size: 0.82rem;
+  }
+}
+
+/* ---------- Short screens / landscape phones (e.g. ~390px tall) ---------- */
+@media (max-height: 500px) {
+  .overlay {
+    padding: max(8px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    gap: 6px;
+  }
+
+  .hud-top {
+    gap: 8px;
+  }
+
+  .brand {
+    padding: 6px 12px;
+  }
+
+  .brand h1 {
+    font-size: 0.95rem;
+  }
+
+  .brand p {
+    display: none;
+  }
+
+  .telemetry {
+    grid-template-columns: repeat(4, auto);
+    gap: 4px 14px;
+    padding: 6px 12px;
+  }
+
+  .telemetry dt {
+    font-size: 0.6rem;
+  }
+
+  .telemetry dd {
+    font-size: 0.84rem;
+  }
+
+  .countdown {
+    font-size: clamp(2.5rem, 12vh, 4.5rem);
+  }
+
+  .controls {
+    gap: 6px;
+  }
+
+  .btn {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.82rem;
+    border-radius: 10px;
+  }
+
+  .btn.primary {
+    min-width: 180px;
+    max-width: 260px;
+    width: auto;
+    min-height: 40px;
+    padding: 0 24px;
+    font-size: 0.92rem;
+  }
+
+  .cam-controls {
+    display: flex;
+    flex-wrap: wrap;
+    grid-template-columns: none;
+    width: auto;
+    max-width: none;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .hint {
+    padding: 4px 12px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-height: 350px) {
+  .overlay {
+    gap: 4px;
+    padding: max(4px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+      max(4px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  .brand {
+    padding: 4px 10px;
+  }
+
+  .brand h1 {
+    font-size: 0.88rem;
+  }
+
+  .telemetry {
+    padding: 4px 10px;
+    gap: 2px 10px;
+  }
+
+  .telemetry dd {
+    font-size: 0.78rem;
+  }
+
+  .controls {
+    gap: 4px;
+  }
+
+  .btn {
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+  }
+
+  .btn.primary {
+    min-height: 36px;
+    min-width: 150px;
+    padding: 0 18px;
+    font-size: 0.85rem;
+  }
+
+  .hint {
+    padding: 3px 8px;
+    font-size: 0.66rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown.tick,
+  .overlay,
+  .btn {
+    animation: none;
+    transition: none;
+  }
+}

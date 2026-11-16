@@ -1,0 +1,9 @@
+{
+  "name": "rocket-launch-3d",
+  "version": "1.0.0",
+  "description": "Interactive 3D rocket launch with SpaceX-style first stage reuse",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

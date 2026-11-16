@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rocket Launch · 3D</title>
+<style>
+  :root {
+    --panel: rgba(12, 22, 36, 0.55);
+    --text: #f5f8fb;
+    --muted: #c3d3e0;
+    --amber: #ffd27a;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+    background: #9fd3f0;
+  }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+
+  .panel {
+    position: fixed;
+    background: var(--panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  }
+
+  .title { top: 16px; left: 16px; padding: 12px 16px; max-width: 260px; }
+  .title h1 { margin: 0; font-size: 18px; letter-spacing: 0.02em; }
+  .title p { margin: 3px 0 0; font-size: 12px; color: var(--muted); }
+
+  .telemetry {
+    top: 16px; right: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 10px 24px;
+    padding: 12px 16px;
+  }
+  .telemetry span {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .telemetry strong { font-size: 16px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #status { color: var(--amber); }
+
+  .countdown {
+    position: fixed;
+    left: 50%; top: 40%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(64px, 14vw, 160px);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .countdown.show { opacity: 1; }
+  .countdown.pulse { animation: pulse 0.9s ease-out; }
+  .countdown.paused { animation-play-state: paused; }
+  @keyframes pulse {
+    0%   { transform: translate(-50%, -50%) scale(1.25); opacity: 0.2; }
+    30%  { opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  .controls {
+    left: 50%;
+    bottom: calc(44px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+  }
+  .btn {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.12s, background 0.2s, opacity 0.2s;
+  }
+  .btn:hover { background: rgba(255, 255, 255, 0.2); }
+  .btn:active { transform: scale(0.96); }
+  .btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn[aria-pressed="false"] { opacity: 0.75; }
+  .btn.primary {
+    background: linear-gradient(135deg, #ff8a3d, #ff4d2e);
+    border-color: transparent;
+    padding: 0 28px;
+    font-size: 16px;
+    box-shadow: 0 6px 18px rgba(255, 90, 40, 0.4);
+  }
+  .btn.primary.abort { background: linear-gradient(135deg, #8d99a8, #56606d); box-shadow: none; }
+
+  .hint {
+    position: fixed;
+    left: 50%; bottom: 12px;
+    transform: translateX(-50%);
+    margin: 0;
+    font-size: 12px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 5px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .title { top: 10px; left: 10px; right: 10px; max-width: none; padding: 8px 12px; }
+    .title h1 { font-size: 15px; }
+    .title p { font-size: 11px; }
+    .telemetry {
+      top: 70px; left: 10px; right: 10px;
+      grid-template-columns: 1.2fr 1.5fr 1fr 1fr;
+      gap: 8px;
+      padding: 8px 10px;
+    }
+    .telemetry span { font-size: 9px; letter-spacing: 0.04em; }
+    .telemetry strong { font-size: 13px; white-space: normal; }
+    .controls {
+      left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
+      transform: none; width: auto; max-width: none;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .controls .primary { grid-column: 1 / -1; min-height: 52px; }
+    .btn { min-height: 48px; padding: 0 8px; font-size: 13px; }
+    .hint { display: none; }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape), (max-height: 460px) {
+    .hint { display: none !important; }
+    .title {
+      top: 8px; left: calc(8px + env(safe-area-inset-left));
+      right: auto; max-width: 220px;
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+    .title h1 { font-size: 13px; }
+    .title p { font-size: 10px; margin: 2px 0 0; }
+    .telemetry {
+      top: 8px; right: calc(8px + env(safe-area-inset-right));
+      left: auto;
+      grid-template-columns: repeat(2, auto);
+      gap: 4px 16px;
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+    .telemetry span { font-size: 9px; letter-spacing: 0.04em; }
+    .telemetry strong { font-size: 12px; white-space: nowrap; }
+    .controls {
+      left: 50%;
+      right: auto;
+      bottom: calc(8px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right));
+      max-height: calc(100vh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px 6px;
+      padding: 5px 8px;
+      border-radius: 12px;
+      overflow-x: auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .controls::-webkit-scrollbar { display: none; }
+    .btn {
+      min-height: 34px;
+      min-width: 32px;
+      padding: 0 8px;
+      font-size: 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+    .controls .primary {
+      grid-column: auto;
+      min-height: 34px;
+      padding: 0 14px;
+      font-size: 12px;
+    }
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="scene" aria-label="3D view of a rocket on a launch pad"></canvas>
+
+<header class="panel title">
+  <h1>Launch Complex</h1>
+  <p>Drag to orbit · Scroll or pinch to zoom</p>
+</header>
+
+<section class="panel telemetry" aria-live="polite">
+  <div><span>Status</span><strong id="status">Standing by</strong></div>
+  <div><span>Mission time</span><strong id="met">—</strong></div>
+  <div><span>Altitude</span><strong id="alt">0 m</strong></div>
+  <div><span>Speed</span><strong id="spd">0 m/s</strong></div>
+</section>
+
+<div id="count" class="countdown" aria-live="assertive"></div>
+
+<nav class="panel controls" aria-label="Launch and camera controls">
+  <button id="launch" class="btn primary" type="button">Launch</button>
+  <button id="pause" class="btn" type="button" disabled>Pause</button>
+  <button id="zoomOut" class="btn" type="button" aria-label="Zoom out">Zoom −</button>
+  <button id="zoomIn" class="btn" type="button" aria-label="Zoom in">Zoom +</button>
+  <button id="follow" class="btn" type="button" aria-pressed="true">Follow: on</button>
+  <button id="resetCam" class="btn" type="button">Reset camera</button>
+  <button id="resetRocket" class="btn" type="button">Reset rocket</button>
+</nav>
+
+<p class="hint desk-only">Space: launch · R: reset camera · +/−: zoom</p>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ---------- Tunables ---------- */
+const PAD_Y = 3;                       // top of the launch mount; the nozzle sits here
+const COUNTDOWN = 10;                  // seconds
+const FLIGHT_DURATION = 60;           // seconds of flight before the mission ends
+const IGNITION_TIME = 3;               // engine build-up before the hold-down releases
+const ASCENT_V = 85, ASCENT_TAU = 4;   // vertical speed target (m/s) and response time (s)
+const DRIFT_V = 110, DRIFT_TAU = 5;    // downrange speed target and response time
+const DRIFT_START = 5;                 // seconds before the pitch-over begins
+const AZIMUTH = -0.55;                 // heading of travel (radians)
+const HOME_POS = new THREE.Vector3(46, 20, 62);
+const HOME_TARGET = new THREE.Vector3(0, 15, 0);
+const SUN_DIR = new THREE.Vector3(80, 140, -60).normalize();
+const UP = new THREE.Vector3(0, 1, 0);
+
+/* ---------- Renderer, scene, camera ---------- */
+const $ = id => document.getElementById(id);
+const canvas = $('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const scene = new THREE.Scene();
+const HORIZON = new THREE.Color(0xcde9f7);
+scene.fog = new THREE.Fog(HORIZON, 700, 4500);
+
+const camera = new THREE.PerspectiveCamera(50, 1, 0.5, 12000);
+camera.position.copy(HOME_POS);
+
+const controls = new OrbitControls(camera, canvas);
+controls.target.copy(HOME_TARGET);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.enablePan = false;            // pan would fight the follow camera and two-finger zoom on touch
+controls.minDistance = 14;
+controls.maxDistance = 400;
+controls.maxPolarAngle = Math.PI * 0.48;
+controls.update();
+
+/* ---------- Sky ---------- */
+const skyMat = new THREE.ShaderMaterial({
+  side: THREE.BackSide,
+  depthWrite: false,
+  uniforms: {
+    top: { value: new THREE.Color(0x3b7fdc) },
+    horizon: { value: HORIZON },
+    bottom: { value: new THREE.Color(0xbfe6f5) },
+    sunDir: { value: SUN_DIR },
+  },
+  vertexShader: `
+    varying vec3 vDir;
+    void main() {
+      vDir = normalize(position);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }`,
+  fragmentShader: `
+    uniform vec3 top; uniform vec3 horizon; uniform vec3 bottom; uniform vec3 sunDir;
+    varying vec3 vDir;
+    void main() {
+      float h = vDir.y;
+      vec3 col = h > 0.0 ? mix(horizon, top, pow(h, 0.55)) : mix(horizon, bottom, min(-h * 4.0, 1.0));
+      float s = max(dot(normalize(vDir), sunDir), 0.0);
+      col += vec3(1.0, 0.95, 0.8) * (pow(s, 600.0) * 1.5 + pow(s, 8.0) * 0.25);
+      gl_FragColor = vec4(col, 1.0);
+      #include <colorspace_fragment>
+    }`,
+});
+const sky = new THREE.Mesh(new THREE.SphereGeometry(6000, 32, 16), skyMat);
+sky.frustumCulled = false;
+scene.add(sky);
+
+/* ---------- Lights ---------- */
+scene.add(new THREE.HemisphereLight(0xcfeeff, 0x5d8a3c, 1.4));
+const sun = new THREE.DirectionalLight(0xfff3dc, 2.4);
+sun.position.copy(SUN_DIR).multiplyScalar(200);
+scene.add(sun);
+const exhaustLight = new THREE.PointLight(0xff9a3c, 0, 90, 2);
+scene.add(exhaustLight);
+
+/* ---------- Helpers ---------- */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rand = mulberry32(2026);         // scenery layout is seeded so it's identical every load
+
+function box(parent, mat, size, pos) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(...size), mat);
+  m.position.set(...pos);
+  parent.add(m);
+  return m;
+}
+
+function makeGroundTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d');
+  g.fillStyle = '#6fa34b';
+  g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 900; i++) {
+    g.fillStyle = `hsla(${95 + rand() * 25}, ${40 + rand() * 25}%, ${30 + rand() * 25}%, 0.25)`;
+    g.beginPath();
+    g.arc(rand() * 256, rand() * 256, 1 + rand() * 4, 0, Math.PI * 2);
+    g.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(200, 200);
+  t.anisotropy = 8;
+  return t;
+}
+
+/* ---------- Ground ---------- */
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(12000, 12000),
+  new THREE.MeshStandardMaterial({ map: makeGroundTexture(), roughness: 1 })
+);
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+
+/* ---------- Launch complex ---------- */
+const concrete = new THREE.MeshStandardMaterial({ color: 0xcfcbc1, roughness: 0.95 });
+const steel = new THREE.MeshStandardMaterial({ color: 0x8c97a3, metalness: 0.55, roughness: 0.45 });
+
+// Apron and a square mount with a 4×4 flame hole in the middle
+const pad = new THREE.Group();
+scene.add(pad);
+box(pad, concrete, [70, 0.06, 70], [0, 0.03, 0]);
+box(pad, concrete, [12, 3, 4], [0, 1.5, 4]);
+box(pad, concrete, [12, 3, 4], [0, 1.5, -4]);
+box(pad, concrete, [4, 3, 4], [4, 1.5, 0]);
+box(pad, concrete, [4, 3, 4], [-4, 1.5, 0]);
+
+// Lightning/service tower beside the pad
+const tower = new THREE.Group();
+tower.position.set(-12, 0, 0);
+scene.add(tower);
+for (const [x, z] of [[-2, -2], [2, -2], [-2, 2], [2, 2]]) box(tower, steel, [0.5, 40, 0.5], [x, 20, z]);
+for (let y = 4; y <= 38; y += 4) {
+  box(tower, steel, [4.5, 0.35, 0.35], [0, y, -2]);
+  box(tower, steel, [4.5, 0.35, 0.35], [0, y, 2]);
+  box(tower, steel, [0.35, 0.35, 4.5], [-2, y, 0]);
+  box(tower, steel, [0.35, 0.35, 4.5], [2, y, 0]);
+}
+box(tower, steel, [5.5, 0.6, 5.5], [0, 40, 0]);
+
+/* ---------- Rocket ---------- */
+// Local origin = bottom of the nozzle, so the exhaust starts at (0, 0, 0)
+function buildRocket() {
+  const g = new THREE.Group();
+  const hull = new THREE.MeshStandardMaterial({ color: 0xf2f4f7, metalness: 0.15, roughness: 0.35 });
+  const red = new THREE.MeshStandardMaterial({ color: 0xd62f22, roughness: 0.4 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x3a3f47, metalness: 0.7, roughness: 0.4 });
+  const glass = new THREE.MeshStandardMaterial({ color: 0x1d3b5c, metalness: 0.6, roughness: 0.15 });
+
+  const toV2 = pts => pts.map(([x, y]) => new THREE.Vector2(x, y));
+  const body = new THREE.Mesh(new THREE.LatheGeometry(toV2([
+    [1.5, 2], [1.6, 2.6], [1.6, 24], [1.45, 25], [1.2, 27], [0.85, 29.8], [0.4, 31.8], [0.01, 33.2],
+  ]), 48), hull);
+  const nozzle = new THREE.Mesh(new THREE.LatheGeometry(toV2([
+    [1.0, 0], [1.25, 0.9], [1.5, 2.1],
+  ]), 48), dark);
+  g.add(body, nozzle);
+
+  for (const y of [8, 20]) {
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(1.63, 1.63, 1.2, 48, 1, true), red);
+    band.position.y = y;
+    g.add(band);
+  }
+
+  const porthole = new THREE.Mesh(new THREE.SphereGeometry(0.45, 24, 16), glass);
+  porthole.position.set(0, 16, 1.6);
+  porthole.scale.set(1, 1.3, 0.35);
+  g.add(porthole);
+
+  const finShape = new THREE.Shape();
+  finShape.moveTo(1.2, 2.2);
+  finShape.lineTo(4.4, 2.2);
+  finShape.lineTo(1.6, 10.5);
+  finShape.lineTo(1.2, 10.5);
+  finShape.closePath();
+  const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 0.3, bevelEnabled: false });
+  finGeo.translate(0, 0, -0.15);
+  for (let i = 0; i < 4; i++) {
+    const fin = new THREE.Mesh(finGeo, red);
+    fin.rotation.y = i * Math.PI / 2;
+    g.add(fin);
+  }
+  return g;
+}
+const rocket = buildRocket();
+rocket.position.set(0, PAD_Y, 0);
+scene.add(rocket);
+
+/* ---------- Scenery ---------- */
+// Trees
+const trunkGeo = new THREE.CylinderGeometry(0.35, 0.5, 3, 6);
+const pineGeo = new THREE.ConeGeometry(2.6, 7, 7);
+const roundGeo = new THREE.IcosahedronGeometry(2.6, 0);
+const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6d4c30, roughness: 1 });
+const greens = [0x2f6b3a, 0x3b7d3f, 0x4f8f3e].map(c =>
+  new THREE.MeshStandardMaterial({ color: c, flatShading: true, roughness: 0.9 }));
+for (let i = 0; i < 260; i++) {
+  const a = rand() * Math.PI * 2;
+  const r = 60 + Math.pow(rand(), 0.7) * 1200;
+  const pine = rand() < 0.55;
+  const tree = new THREE.Group();
+  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+  trunk.position.y = 1.5;
+  const crown = new THREE.Mesh(pine ? pineGeo : roundGeo, greens[Math.floor(rand() * greens.length)]);
+  crown.position.y = pine ? 6.5 : 5.2;
+  tree.add(trunk, crown);
+  tree.scale.setScalar(0.8 + rand() * 1.1);
+  tree.rotation.y = rand() * 6;
+  tree.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+  scene.add(tree);
+}
+
+// Rolling hills
+const hillMats = [0x6f9b5c, 0x5e8c55, 0x7aa566].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 1 }));
+const hillGeo = new THREE.SphereGeometry(1, 28, 14);
+for (let i = 0; i < 26; i++) {
+  const a = (i / 26) * Math.PI * 2 + rand() * 0.2;
+  const r = 1400 + rand() * 400;
+  const rx = 260 + rand() * 260, ry = 90 + rand() * 110;
+  const hill = new THREE.Mesh(hillGeo, hillMats[i % hillMats.length]);
+  hill.scale.set(rx, ry, rx * 0.8);
+  hill.position.set(Math.cos(a) * r, ry * 0.2, Math.sin(a) * r);
+  scene.add(hill);
+}
+
+// Distant mountains with snow caps
+const mountainMat = new THREE.MeshStandardMaterial({ color: 0x7d8fa6, flatShading: true, roughness: 1 });
+const snowMat = new THREE.MeshStandardMaterial({ color: 0xf4f8fb, flatShading: true, roughness: 0.8 });
+for (let i = 0; i < 18; i++) {
+  const a = rand() * Math.PI * 2;
+  const r = 2600 + rand() * 900;
+  const h = 500 + rand() * 600;
+  const rad = h * (0.5 + rand() * 0.3);
+  const x = Math.cos(a) * r, z = Math.sin(a) * r;
+  const m = new THREE.Mesh(new THREE.ConeGeometry(rad, h, 7), mountainMat);
+  m.position.set(x, h / 2, z);
+  const snow = new THREE.Mesh(new THREE.ConeGeometry(rad * 0.38, h * 0.28, 7), snowMat);
+  snow.position.set(x, h * 0.86, z);
+  scene.add(m, snow);
+}
+
+// Clouds
+const cloudGeo = new THREE.IcosahedronGeometry(1, 2);
+const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, emissive: 0xdde6ef, emissiveIntensity: 0.25 });
+for (let i = 0; i < 26; i++) {
+  const cloud = new THREE.Group();
+  const puffs = 5 + Math.floor(rand() * 4);
+  for (let j = 0; j < puffs; j++) {
+    const p = new THREE.Mesh(cloudGeo, cloudMat);
+    p.position.set((rand() - 0.5) * 44, (rand() - 0.5) * 6, (rand() - 0.5) * 18);
+    p.scale.setScalar(9 + rand() * 9);
+    cloud.add(p);
+  }
+  const a = rand() * Math.PI * 2, r = 500 + rand() * 2000;
+  cloud.position.set(Math.cos(a) * r, 180 + rand() * 200, Math.sin(a) * r);
+  scene.add(cloud);
+}
+
+/* ---------- Particles (flame and smoke sprites, pooled) ---------- */
+function makeRadialTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grd.addColorStop(0, 'rgba(255,255,255,1)');
+  grd.addColorStop(0.45, 'rgba(255,255,255,0.55)');
+  grd.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+const puffTexture = makeRadialTexture();
+
+function makePool(count, blending) {
+  const pool = [];
+  for (let i = 0; i < count; i++) {
+    const mat = new THREE.SpriteMaterial({ map: puffTexture, transparent: true, depthWrite: false, blending });
+    const sprite = new THREE.Sprite(mat);
+    sprite.visible = false;
+    scene.add(sprite);
+    pool.push({
+      sprite, mat, alive: false,
+      t: 0, life: 1, drag: 0, buoy: 0, s0: 1, s1: 1, a: 1,
+      vel: new THREE.Vector3(), c0: new THREE.Color(), c1: new THREE.Color(),
+    });
+  }
+  return pool;
+}
+const flamePool = makePool(260, THREE.AdditiveBlending);
+const smokePool = makePool(260, THREE.NormalBlending);
+
+const FLAME_HOT = new THREE.Color(1.0, 0.97, 0.8);
+const FLAME_COOL = new THREE.Color(1.0, 0.4, 0.1);
+const SMOKE_A = new THREE.Color(0.92, 0.92, 0.92);
+const SMOKE_B = new THREE.Color(0.75, 0.77, 0.8);
+const TRAIL_A = new THREE.Color(0.96, 0.96, 0.96);
+const TRAIL_B = new THREE.Color(0.85, 0.87, 0.9);
+
+function spawn(pool, o) {
+  const p = pool.find(q => !q.alive);
+  if (!p) return;
+  p.alive = true;
+  p.t = 0;
+  p.life = o.life;
+  p.drag = o.drag;
+  p.buoy = o.buoy;
+  p.s0 = o.s0;
+  p.s1 = o.s1;
+  p.a = o.a;
+  p.sprite.position.copy(o.pos);
+  p.vel.copy(o.vel);
+  p.c0.copy(o.c0);
+  p.c1.copy(o.c1);
+  p.sprite.visible = true;
+}
+
+function killAll() {
+  for (const pool of [flamePool, smokePool]) {
+    for (const p of pool) { p.alive = false; p.sprite.visible = false; }
+  }
+}
+
+function randVec(s) {
+  return new THREE.Vector3((Math.random() * 2 - 1) * s, (Math.random() * 2 - 1) * s, (Math.random() * 2 - 1) * s);
+}
+
+function spawnFlame(origin, dir, power) {
+  const speed = (8 + 30 * power) * (0.75 + Math.random() * 0.5);
+  spawn(flamePool, {
+    pos: origin.clone().add(randVec(0.5 + power)),
+    vel: dir.clone().multiplyScalar(speed).add(randVec(2 + 4 * power)),
+    life: 0.45 + Math.random() * 0.3,
+    drag: 1.5, buoy: 0,
+    s0: 2 + 2 * power, s1: 3 + 5 * power * (0.6 + Math.random() * 0.6),
+    a: 0.95, c0: FLAME_HOT, c1: FLAME_COOL,
+  });
+}
+
+function spawnExhaustSmoke(origin, dir, power) {
+  spawn(smokePool, {
+    pos: origin.clone().addScaledVector(dir, 2).add(randVec(1)),
+    vel: dir.clone().multiplyScalar(4 + 6 * power).add(randVec(1.5)),
+    life: 2.5 + Math.random() * 1.5,
+    drag: 0.8, buoy: 1.5,
+    s0: 3, s1: 9 + 6 * power * Math.random(),
+    a: 0.5, c0: TRAIL_A, c1: TRAIL_B,
+  });
+}
+
+// Billowing cloud that spreads across the pad at ignition
+function spawnPadSmoke(count) {
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = 3 + Math.random() * 5;
+    const dx = Math.cos(a), dz = Math.sin(a);
+    const speed = 5 + Math.random() * 9;
+    spawn(smokePool, {
+      pos: new THREE.Vector3(dx * r, 0.8 + Math.random() * 1.2, dz * r),
+      vel: new THREE.Vector3(dx * speed, 1.5 + Math.random() * 2, dz * speed),
+      life: 4 + Math.random() * 3,
+      drag: 1.2, buoy: 0.5,
+      s0: 5, s1: 18 + Math.random() * 10,
+      a: 0.7, c0: SMOKE_A, c1: SMOKE_B,
+    });
+  }
+}
+
+function updateParticles(dt) {
+  for (const pool of [flamePool, smokePool]) {
+    for (const p of pool) {
+      if (!p.alive) continue;
+      p.t += dt;
+      const f = p.t / p.life;
+      if (f >= 1) { p.alive = false; p.sprite.visible = false; continue; }
+      p.vel.multiplyScalar(Math.exp(-p.drag * dt));
+      p.vel.y += p.buoy * dt;
+      p.sprite.position.addScaledVector(p.vel, dt);
+      if (p.sprite.position.y < 0.6) {          // flames spread along the ground instead of sinking into it
+        p.sprite.position.y = 0.6;
+        p.vel.y = Math.abs(p.vel.y) * 0.25;
+        p.vel.x *= 0.9;
+        p.vel.z *= 0.9;
+      }
+      const s = THREE.MathUtils.lerp(p.s0, p.s1, f);
+      p.sprite.scale.set(s, s, 1);
+      p.mat.color.copy(p.c0).lerp(p.c1, f);
+      p.mat.opacity = p.a * Math.min(1, f * 5) * (1 - f);
+    }
+  }
+}
+
+/* ---------- Trajectory ---------- */
+// Closed-form ascent: rises quickly, then pitches over and keeps climbing away (never returns).
+function flightState(s) {
+  const u = Math.max(0, s - DRIFT_START);
+  const ev = Math.exp(-s / ASCENT_TAU);
+  const ed = Math.exp(-u / DRIFT_TAU);
+  return {
+    x: DRIFT_V * (u - DRIFT_TAU * (1 - ed)),   // downrange distance
+    y: ASCENT_V * (s - ASCENT_TAU * (1 - ev)), // altitude above the pad
+    vx: DRIFT_V * (1 - ed),
+    vy: ASCENT_V * (1 - ev),
+  };
+}
+
+/* ---------- State ---------- */
+const S = {
+  phase: 'idle',          // idle | countdown | ignition | flight | finished
+  paused: false,
+  timer: 0,
+  flight: 0,
+  alt: 0,
+  speed: 0,
+  status: 'Standing by',
+  shown: '',
+  follow: true,
+  dir: UP.clone(),
+  pull: 0,                // eased extra camera distance during follow
+  factor: 1,              // pull factor currently applied to the camera offset
+};
+let tween = null;         // animated return to home view
+let flameAcc = 0, smokeAcc = 0;
+let shakeVec = new THREE.Vector3();
+
+const _v = new THREE.Vector3(), _n = new THREE.Vector3(), _e = new THREE.Vector3();
+const _d = new THREE.Vector3(), _o = new THREE.Vector3(), _q = new THREE.Quaternion();
+
+function setStatus(t) { S.status = t; }
+
+const countEl = $('count');
+function showCount(text) {
+  if (S.shown === text) return;
+  S.shown = text;
+  countEl.textContent = text;
+  countEl.classList.remove('pulse');
+  void countEl.offsetWidth;                // restart the pulse animation
+  countEl.classList.add('pulse', 'show');
+}
+function hideCount() {
+  S.shown = '';
+  countEl.classList.remove('show');
+}
+
+function refreshUI() {
+  const launch = $('launch');
+  const labels = { idle: 'Launch', countdown: 'Abort', ignition: 'Igniting…', flight: 'In flight', finished: 'Replay launch' };
+  launch.textContent = labels[S.phase];
+  launch.classList.toggle('abort', S.phase === 'countdown');
+  launch.disabled = S.phase === 'ignition' || S.phase === 'flight';
+  const pause = $('pause');
+  pause.disabled = S.phase === 'idle' || S.phase === 'finished';
+  pause.textContent = S.paused ? 'Resume' : 'Pause';
+  pause.setAttribute('aria-pressed', String(S.paused));
+  countEl.classList.toggle('paused', S.paused);
+  const follow = $('follow');
+  follow.textContent = S.follow ? 'Follow: on' : 'Follow: off';
+  follow.setAttribute('aria-pressed', String(S.follow));
+}
+
+function startCountdown() {
+  S.phase = 'countdown';
+  S.timer = 0;
+  setStatus('Countdown');
+  refreshUI();
+}
+
+function abortCountdown() {
+  S.phase = 'idle';
+  S.timer = 0;
+  hideCount();
+  setStatus('Aborted');
+  refreshUI();
+}
+
+function beginIgnition() {
+  S.phase = 'ignition';
+  S.timer = 0;
+  showCount('Ignition');
+  setStatus('Engine ignition');
+  spawnPadSmoke(40);
+  refreshUI();
+}
+
+function liftoff() {
+  S.phase = 'flight';
+  S.flight = 0;
+  showCount('Liftoff');
+  refreshUI();
+}
+
+function resetCamera() {
+  S.follow = false;
+  S.pull = 0;
+  S.factor = 1;
+  tween = { t: 0, from: camera.position.clone(), fromTarget: controls.target.clone() };
+  refreshUI();
+}
+
+function resetRocket() {
+  S.paused = false;
+  flameAcc = smokeAcc = 0;
+  exhaustLight.intensity = 0;
+  S.phase = 'idle';
+  S.timer = 0;
+  S.flight = 0;
+  S.alt = 0;
+  S.speed = 0;
+  S.dir.copy(UP);
+  rocket.position.set(0, PAD_Y, 0);
+  rocket.quaternion.identity();
+  killAll();
+  hideCount();
+  setStatus('Standing by');
+  resetCamera();
+  refreshUI();
+}
+
+function zoom(factor) {
+  tween = null;
+  _o.subVectors(camera.position, controls.target);
+  _o.setLength(THREE.MathUtils.clamp(_o.length() * factor, controls.minDistance, controls.maxDistance));
+  camera.position.copy(controls.target).add(_o);
+}
+
+function applyShake(amount) {
+  camera.position.sub(shakeVec);
+  shakeVec.set((Math.random() - 0.5) * amount, (Math.random() - 0.5) * amount, (Math.random() - 0.5) * amount);
+  camera.position.add(shakeVec);
+}
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/* ---------- Per-frame update ---------- */
+function update(dt) {
+  let power = 0;
+
+  // Countdown
+  if (S.phase === 'countdown') {
+    S.timer += dt;
+    if (S.timer < COUNTDOWN) showCount(String(Math.ceil(COUNTDOWN - S.timer)));
+    else beginIgnition();
+  }
+
+  // Engine build-up; the rocket shudders while the hold-down is still on
+  if (S.phase === 'ignition') {
+    S.timer += dt;
+    power = Math.min(1, S.timer / IGNITION_TIME);
+    rocket.position.set((Math.random() - 0.5) * 0.08 * power, PAD_Y, (Math.random() - 0.5) * 0.08 * power);
+    if (S.timer >= IGNITION_TIME) liftoff();
+  }
+
+  // Flight
+  if (S.phase === 'flight') {
+    S.flight += dt;
+    power = 1;
+    const st = flightState(S.flight);
+    const ca = Math.cos(AZIMUTH), sa = Math.sin(AZIMUTH);
+    rocket.position.set(st.x * ca, PAD_Y + st.y, st.x * sa);
+    _v.set(st.vx * ca, st.vy, st.vx * sa);
+    if (_v.lengthSq() > 1e-6) S.dir.copy(_v).normalize();
+    rocket.quaternion.setFromUnitVectors(UP, S.dir);
+    S.alt = st.y;
+    S.speed = _v.length();
+    if (S.flight > 1.6 && S.shown === 'Liftoff') hideCount();
+    setStatus(S.flight < 6 ? 'Ascent' : S.flight < 18 ? 'Pitch program' : 'Downrange coast');
+    if (S.flight >= FLIGHT_DURATION) {
+      S.phase = 'finished';
+      power = 0;
+      setStatus('Mission complete');
+      refreshUI();
+    }
+  }
+
+  // Exhaust, smoke and light
+  rocket.updateMatrixWorld(true);
+  const nozzle = rocket.localToWorld(_n.set(0, 0, 0));
+  const exhaustDir = _e.copy(S.dir).negate();
+  if (power > 0) {
+    flameAcc += dt * (60 + 120 * power);
+    while (flameAcc >= 1) { flameAcc -= 1; spawnFlame(nozzle, exhaustDir, power); }
+    smokeAcc += dt * (S.phase === 'flight' ? 28 : 10) * power;
+    while (smokeAcc >= 1) { smokeAcc -= 1; spawnExhaustSmoke(nozzle, exhaustDir, power); }
+    exhaustLight.position.copy(nozzle).addScaledVector(exhaustDir, 3);
+    exhaustLight.intensity = 160 * power * (0.85 + Math.random() * 0.3);
+  } else {
+    exhaustLight.intensity = 0;
+  }
+
+  // Camera: animated reset, then follow with eased pull-back
+  if (tween) {
+    tween.t = Math.min(1, tween.t + dt / 1.2);
+    const e = easeInOutCubic(tween.t);
+    camera.position.lerpVectors(tween.from, HOME_POS, e);
+    controls.target.lerpVectors(tween.fromTarget, HOME_TARGET, e);
+    if (tween.t >= 1) tween = null;
+  }
+  if (S.phase === 'flight' && S.follow && !tween) {
+    // Track the rocket's body exactly (an eased follow lags behind a fast-moving rocket and pushes it off-centre).
+    // Camera and target move together, so the user's orbit angle and zoom survive the follow.
+    _d.copy(S.dir).multiplyScalar(16).add(rocket.position).sub(controls.target);
+    controls.target.add(_d);
+    camera.position.add(_d);
+
+    // Ease the camera slightly further back as the rocket climbs away
+    const goal = Math.min(1, S.flight / 25) * 0.6;
+    S.pull += (goal - S.pull) * (1 - Math.exp(-dt * 1.5));
+    const factor = 1 + S.pull;
+    _o.subVectors(camera.position, controls.target).multiplyScalar(factor / S.factor);
+    camera.position.copy(controls.target).add(_o);
+    S.factor = factor;
+  }
+  updateParticles(dt);
+}
+
+function updateHud() {
+  setText('status', S.status);
+  setText('met', (S.phase === 'flight' || S.phase === 'finished') ? fmtMET(S.flight) : '—');
+  setText('alt', S.alt < 1000 ? `${Math.round(S.alt)} m` : `${(S.alt / 1000).toFixed(2)} km`);
+  setText('spd', `${Math.round(S.speed)} m/s`);
+}
+const hudCache = {};
+function setText(id, text) {
+  if (hudCache[id] === text) return;
+  hudCache[id] = text;
+  $(id).textContent = text;
+}
+function fmtMET(t) {
+  const m = Math.floor(t / 60), s = t - m * 60;
+  return `T+ ${String(m).padStart(2, '0')}:${s.toFixed(1).padStart(4, '0')}`;
+}
+
+/* ---------- Input ---------- */
+$('launch').addEventListener('click', () => {
+  if (S.phase === 'idle') startCountdown();
+  else if (S.phase === 'countdown') { S.paused = false; abortCountdown(); }
+  else if (S.phase === 'finished') {
+    resetRocket();
+    S.follow = true;
+    startCountdown();
+  }
+});
+$('pause').addEventListener('click', () => {
+  S.paused = !S.paused;
+  if (S.paused) applyShake(0);
+  refreshUI();
+});
+$('resetRocket').addEventListener('click', resetRocket);
+$('resetCam').addEventListener('click', resetCamera);
+$('zoomIn').addEventListener('click', () => zoom(0.8));
+$('zoomOut').addEventListener('click', () => zoom(1.25));
+$('follow').addEventListener('click', () => { S.follow = !S.follow; refreshUI(); });
+
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' && e.target.tagName !== 'BUTTON') {
+    e.preventDefault();
+    $('launch').click();
+  } else if (e.code === 'KeyR') {
+    resetCamera();
+  } else if (e.key === '+' || e.key === '=') {
+    zoom(0.8);
+  } else if (e.key === '-' || e.key === '_') {
+    zoom(1.25);
+  }
+});
+
+// A user drag cancels any camera tween in progress
+controls.addEventListener('start', () => { tween = null; });
+
+/* ---------- Sizing ---------- */
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 0.9 ? 62 : 50;   // wider lens in portrait so the pad fits
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* ---------- Loop ---------- */
+const clock = new THREE.Clock();
+refreshUI();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (!S.paused) update(dt);
+  controls.update();
+  if (!S.paused) applyShake(S.phase === 'ignition' ? S.timer / IGNITION_TIME * 0.05 : 0);
+  sky.position.copy(camera.position);
+  updateHud();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
