@@ -1,0 +1,19 @@
+{
+  "name": "spaceship-flight-sim",
+  "version": "1.0.0",
+  "description": "Interactive 3D spaceship test flight simulator featuring local circuit and landing pad",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0",
+    "vitest": "^2.1.0"
+  }
+}

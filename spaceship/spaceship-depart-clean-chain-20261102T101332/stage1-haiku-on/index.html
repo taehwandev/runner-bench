@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Interactive 3D scene: a spaceship lifts off from a landing pad, makes a slow lap, and flies into the distance.">
+  <title>Pad 07 · Departure</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body data-phase="hover">
+  <canvas id="scene" aria-label="3D view of a spaceship above a landing pad"></canvas>
+
+  <header class="hud">
+    <div class="title">Pad 07 · Departure</div>
+    <div class="status" id="status" role="status" aria-live="polite">Hovering over the pad.</div>
+    <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
+  </header>
+
+  <p class="hint" id="hint"></p>
+
+  <nav class="dock" aria-label="Scene controls">
+    <div class="group main">
+      <button id="launch" class="primary">Launch</button>
+      <button id="reset-scene" class="ghost" disabled>Reset scene</button>
+    </div>
+    <div class="group cam">
+      <button id="zoom-out" aria-label="Zoom out">&minus;</button>
+      <button id="zoom-in" aria-label="Zoom in">+</button>
+      <button id="reset-cam" aria-label="Reset camera">Reset camera</button>
+      <button id="follow" aria-pressed="false" title="Keep the camera on the ship (F)">Follow</button>
+    </div>
+  </nav>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

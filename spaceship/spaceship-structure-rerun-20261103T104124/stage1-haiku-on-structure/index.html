@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Interactive 3D scene: a spaceship hovers over a landing pad, makes one slow lap, then flies off into the distance.">
+  <title>Spaceship Departure</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="scene" aria-label="3D view of a spaceship hovering above a landing pad"></canvas>
+
+  <header class="panel hud">
+    <h1>Spaceship Departure</h1>
+    <p id="status" role="status" aria-live="polite">Hovering above the landing pad</p>
+    <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+  </header>
+
+  <nav class="panel controls" aria-label="Scene controls">
+    <button id="launch" class="primary" type="button">Launch</button>
+    <button id="zoom-in" type="button" aria-label="Zoom in">
+      <span aria-hidden="true">+</span> Zoom in
+    </button>
+    <button id="zoom-out" type="button" aria-label="Zoom out">
+      <span aria-hidden="true">&minus;</span> Zoom out
+    </button>
+    <button id="reset" type="button">Reset view</button>
+  </nav>
+
+  <p class="hint">
+    Drag to orbit · Scroll or pinch to zoom · Keys: <kbd>L</kbd> launch, <kbd>+</kbd>/<kbd>&minus;</kbd> zoom, <kbd>R</kbd> reset
+  </p>
+
+  <noscript>This page needs JavaScript and WebGL to display the 3D scene.</noscript>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

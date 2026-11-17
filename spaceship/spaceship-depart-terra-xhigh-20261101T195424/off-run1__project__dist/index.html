@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#d9e9e4" />
+  <meta name="description" content="A little spacecraft, a quiet landing pad, and a journey into the blue." />
+  <title>Solstice — A little journey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+</head>
+<body>
+  <main class="experience">
+    <div id="scene" aria-label="Interactive 3D scene of a spaceship above a landing pad"></div>
+    <div class="wash"></div>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Solstice home"><span class="brand-mark">✳</span><span>SOLSTICE <small>FLIGHT CLUB</small></span></a>
+      <div class="top-right"><span class="live-dot"></span> A LITTLE JOURNEY <span class="divider"></span> Nº 001</div>
+    </header>
+    <section class="intro" aria-labelledby="title">
+      <div class="eyebrow"><span class="mini-line"></span> AN INTERACTIVE FLIGHT</div>
+      <h1 id="title">A little space<br/><em>to wander.</em></h1>
+      <p>Take the scenic route. Your ship is fueled, the skies are clear, and the universe can wait.</p>
+      <div class="coordinates"><span>✳</span> SOMEWHERE UNDER THE SUN <span class="coord-divider">/</span> 09:41 AM</div>
+    </section>
+    <div class="scene-label"><span class="label-line"></span><span>THE EXPLORER<br/><small>READY FOR DEPARTURE</small></span></div>
+    <aside class="flight-card" aria-live="polite">
+      <div class="card-top"><div><span class="card-kicker">YOUR VESSEL</span><h2>Meet the Explorer <span>↗</span></h2></div><div class="ship-badge">✦</div></div>
+      <p id="flight-copy">A little ship with a big day ahead. Ready when you are.</p>
+      <div class="card-rule"></div>
+      <div class="flight-meta"><span><i></i><b id="flight-status">ALL SYSTEMS READY</b></span><span>01 / 01</span></div>
+      <button id="launch" class="launch"><span>Begin departure</span><span class="arrow">↗</span></button>
+    </aside>
+    <div class="camera-tools" aria-label="Camera controls">
+      <span class="camera-title">CAMERA</span>
+      <button id="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
+      <button id="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
+      <button id="reset" aria-label="Reset camera" title="Reset camera"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11a8 8 0 1 1 2 6M4 5v6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <footer><div class="hint"><span class="drag-icon">↔</span><span><strong>DRAG TO ORBIT</strong><br/>Scroll or pinch to zoom</span></div><div class="footer-right">A MOMENT OF EXPLORATION <span>✳</span></div></footer>
+    <div id="fallback" hidden>Sorry, this experience needs a browser with WebGL enabled.</div>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

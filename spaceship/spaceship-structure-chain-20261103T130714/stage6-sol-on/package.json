@@ -1,0 +1,11 @@
+{
+  "name": "skyport-departure",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive 3D spaceship departure scene (static, no build step)",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/flight.test.mjs",
+    "serve": "python3 -m http.server 8080"
+  }
+}

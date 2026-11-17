@@ -1,0 +1,17 @@
+{
+  "name": "spaceship-flight-sim",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Interactive 3D spaceship test flight experience",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  }
+}

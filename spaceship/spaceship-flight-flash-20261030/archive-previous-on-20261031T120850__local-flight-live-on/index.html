@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Aero-Dart Scout // 3D Spaceship Test Flight</title>
+  <link rel="stylesheet" href="/src/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 3D Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- HUD Interface Layer -->
+  <div id="hud-overlay">
+    <!-- Top Header Bar -->
+    <header class="hud-header">
+      <div class="header-left">
+        <div class="ship-badge">
+          <span class="badge-icon">▲</span>
+          <div class="badge-text">
+            <span class="ship-id">AERO-DART MK.IV</span>
+            <span class="sub-id">TEST FLIGHT // PAD 01</span>
+          </div>
+        </div>
+        <div id="status-pill" class="status-pill state-standby">
+          <span class="status-dot"></span>
+          <span id="status-label">PAD STANDBY</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button id="btn-audio" class="hud-icon-btn" title="Toggle Audio (M)" aria-label="Toggle Audio">
+          <svg id="icon-sound-on" class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="icon-sound-off" class="svg-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <button id="btn-help" class="hud-icon-btn" title="Controls & Help (?)" aria-label="Controls & Help">
+          <span>?</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Telemetry Deck (Top-Left on Desktop, Collapsible on Mobile) -->
+    <aside class="hud-telemetry" id="telemetry-panel">
+      <div class="telemetry-header">
+        <span class="panel-tag">LIVE TELEMETRY</span>
+        <span class="signal-tag">LINK 100%</span>
+      </div>
+
+      <div class="telemetry-grid">
+        <div class="telem-item">
+          <span class="telem-label">ALTITUDE</span>
+          <div class="telem-val"><span id="val-alt">0.0</span> <span class="telem-unit">M</span></div>
+          <div class="meter-bar"><div id="meter-alt" class="meter-fill" style="width: 0%"></div></div>
+        </div>
+
+        <div class="telem-item">
+          <span class="telem-label">AIRSPEED</span>
+          <div class="telem-val"><span id="val-speed">0</span> <span class="telem-unit">KM/H</span></div>
+          <div class="meter-bar"><div id="meter-speed" class="meter-fill" style="width: 0%"></div></div>
+        </div>
+
+        <div class="telem-item">
+          <span class="telem-label">THROTTLE</span>
+          <div class="telem-val"><span id="val-throttle">3</span> <span class="telem-unit">%</span></div>
+          <div class="meter-bar"><div id="meter-throttle" class="meter-fill" style="width: 3%"></div></div>
+        </div>
+
+        <div class="telem-item">
+          <span class="telem-label">G-FORCE</span>
+          <div class="telem-val"><span id="val-gforce">1.0</span> <span class="telem-unit">G</span></div>
+          <div class="meter-bar"><div id="meter-gforce" class="meter-fill" style="width: 25%"></div></div>
+        </div>
+      </div>
+
+      <!-- Circuit Waypoint Progress Indicator -->
+      <div class="circuit-progress-box">
+        <div class="progress-title">
+          <span>CIRCUIT ROUTE</span>
+          <span id="circuit-pct">0%</span>
+        </div>
+        <div class="circuit-steps">
+          <span id="step-pad" class="step active">PAD</span>
+          <span class="step-arrow">→</span>
+          <span id="step-a" class="step">ALPHA</span>
+          <span class="step-arrow">→</span>
+          <span id="step-b" class="step">BRAVO</span>
+          <span class="step-arrow">→</span>
+          <span id="step-c" class="step">CHARLIE</span>
+          <span class="step-arrow">→</span>
+          <span id="step-d" class="step">DELTA</span>
+          <span class="step-arrow">→</span>
+          <span id="step-land" class="step">LAND</span>
+        </div>
+        <div class="route-track">
+          <div id="route-fill" class="route-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Camera Control Floating Widget (Right Side) -->
+    <aside class="hud-camera-deck">
+      <div class="cam-modes-box">
+        <span class="deck-title">CAMERA</span>
+        <div class="cam-mode-buttons">
+          <button id="cam-orbit" class="cam-btn active" title="Free Orbit View (Rotate, Zoom, Pan)">
+            <svg class="cam-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span>Orbit</span>
+          </button>
+          <button id="cam-chase" class="cam-btn" title="Cinematic Chase Camera">
+            <svg class="cam-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+            </svg>
+            <span>Chase</span>
+          </button>
+          <button id="cam-tower" class="cam-btn" title="Tower Observation Cam">
+            <svg class="cam-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H7M15 9H9M19 13H5"></path>
+            </svg>
+            <span>Tower</span>
+          </button>
+          <button id="cam-cockpit" class="cam-btn" title="Pilot Cockpit POV">
+            <svg class="cam-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 14l8-8 8 8"></path>
+              <circle cx="12" cy="14" r="3"></circle>
+            </svg>
+            <span>Cockpit</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Zoom & Reset Tools -->
+      <div class="cam-tools-box">
+        <button id="btn-zoom-in" class="tool-btn" title="Zoom In (+)" aria-label="Zoom In">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button id="btn-zoom-out" class="tool-btn" title="Zoom Out (-)" aria-label="Zoom Out">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button id="btn-cam-reset" class="tool-btn reset-btn" title="Reset Camera View (R)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+          <span class="tool-text">Reset</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Bottom Flight Control Deck -->
+    <footer class="hud-footer">
+      <div class="flight-control-dock">
+        <!-- Main Primary Action Launch/Return Button -->
+        <button id="btn-primary-action" class="primary-launch-btn">
+          <div class="btn-glow"></div>
+          <div class="btn-content">
+            <span id="btn-action-icon" class="btn-icon">▲</span>
+            <span id="btn-action-text" class="btn-title">INITIATE TAKEOFF</span>
+            <span id="btn-action-sub" class="btn-subtext">START LOCAL TEST CIRCUIT</span>
+          </div>
+        </button>
+
+        <!-- Auxiliary Flight Controls -->
+        <div class="aux-controls">
+          <!-- Hover / Hold Toggle -->
+          <button id="btn-hover-hold" class="aux-btn" title="Hover in place (H)">
+            <svg class="aux-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+            <span id="text-hover-hold">Hold Hover</span>
+          </button>
+
+          <!-- Speed Rate Selector -->
+          <div class="speed-selector" title="Flight Speed Multiplier">
+            <span class="speed-label">SPEED</span>
+            <div class="speed-buttons">
+              <button id="speed-05" class="speed-btn" data-speed="0.5">0.5x</button>
+              <button id="speed-10" class="speed-btn active" data-speed="1.0">1.0x</button>
+              <button id="speed-20" class="speed-btn" data-speed="2.0">2.0x</button>
+            </div>
+          </div>
+
+          <!-- Reset Ship to Pad Button -->
+          <button id="btn-reset-pad" class="aux-btn danger-hover" title="Reset Ship to Pad">
+            <svg class="aux-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v10M18 8l-6 6-6-6M4 20h16"></path>
+            </svg>
+            <span>Reset Pad</span>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Help / Keyboard Shortcuts Modal -->
+  <div id="help-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>FLIGHT DIRECTIVES & CONTROLS</h3>
+        <button id="btn-close-help" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="help-section">
+          <h4>FLIGHT CIRCUIT</h4>
+          <p>The <strong>Aero-Dart Mk IV</strong> performs an automated test flight circuit around Pad 01: vertical ascent, landing gear retraction, forward acceleration past 4 navigation waypoints (Alpha, Bravo, Charlie, Delta), and precision descent back to pad touchdown.</p>
+        </div>
+        <div class="help-section">
+          <h4>CAMERA CONTROLS</h4>
+          <ul>
+            <li><strong>Rotate:</strong> Left Mouse Drag / Touch Drag</li>
+            <li><strong>Zoom:</strong> Mouse Wheel / Touch Pinch / <code>+</code> <code>-</code> Buttons</li>
+            <li><strong>Pan:</strong> Right Mouse Drag / Two-finger Drag</li>
+            <li><strong>Camera Modes:</strong> Orbit, Dynamic Chase, Tower Cam, Cockpit</li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h4>KEYBOARD SHORTCUTS</h4>
+          <div class="shortcut-grid">
+            <kbd>SPACE</kbd><span>Takeoff / Return to Pad</span>
+            <kbd>H</kbd><span>Hover / Resume</span>
+            <kbd>C</kbd><span>Cycle Camera Mode</span>
+            <kbd>R</kbd><span>Reset Camera View</span>
+            <kbd>M</kbd><span>Mute / Unmute Audio</span>
+            <kbd>?</kbd><span>Toggle Help</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-ack-help" class="primary-modal-btn">ACKNOWLEDGE</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

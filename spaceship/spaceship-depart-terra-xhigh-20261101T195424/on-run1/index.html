@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#d9e9e8" />
+  <meta name="description" content="A little spacecraft, a quiet landing pad, and a journey into the blue." />
+  <title>Departure Point — A little journey</title>
+</head>
+<body>
+  <main class="experience">
+    <div id="scene" aria-label="Interactive 3D scene of a spaceship above a landing pad"></div>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Departure Point home"><span class="brand-mark">✳</span><span>departure<span class="brand-light">point</span></span></a>
+      <div class="top-right"><span class="live-dot"></span><span>FIELD NOTES <span class="separator">/</span> 001</span></div>
+    </header>
+    <section class="intro" aria-labelledby="title">
+      <div class="eyebrow"><span class="small-line"></span> AN INTERACTIVE LITTLE JOURNEY</div>
+      <h1 id="title">A little space<br/><em>to wander.</em></h1>
+      <p>Take a moment, look around, and send our little explorer on its way.</p>
+      <button id="launch" class="launch"><span class="launch-icon">↗</span><span id="launch-label">Begin departure</span><span class="button-arrow">→</span></button>
+      <div class="launch-note" id="launch-note">READY WHEN YOU ARE</div>
+    </section>
+    <div class="scene-label"><span class="label-line"></span><span>THE EXPLORER <b>01</b></span></div>
+    <aside class="camera-panel" aria-label="Camera controls">
+      <div class="camera-heading"><span>EXPLORE THE SCENE</span><span class="camera-cross">✳</span></div>
+      <div class="camera-instruction"><span class="mouse-icon">↔</span><span><strong>Drag</strong> to orbit <span class="instruction-separator">·</span> <strong class="zoom-hint">Scroll</strong> <span class="zoom-copy">to zoom</span></span></div>
+      <div class="camera-actions"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset" class="reset"><span>↺</span> Reset view</button></div>
+    </aside>
+    <footer><div><span class="footer-dot"></span> <span id="status">ALL SYSTEMS IDLE</span></div><div class="footer-center">A SMALL ADVENTURE, JUST FOR YOU</div><div>01 <span class="footer-slash">/</span> 01</div></footer>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

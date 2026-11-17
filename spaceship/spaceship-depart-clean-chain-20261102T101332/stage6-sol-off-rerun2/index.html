@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Departure · Landing Pad Alpha</title>
+<style>
+  :root {
+    --ink: #10263d;
+    --glass: rgba(255, 255, 255, 0.82);
+    --accent: #ff7a2f;
+    --focus: #1d6fd6;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background: #cfeaff;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #scene {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    outline: none;
+  }
+  .panel {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(16, 38, 61, 0.16);
+  }
+  .hud {
+    position: fixed;
+    top: max(14px, env(safe-area-inset-top));
+    left: max(14px, env(safe-area-inset-left));
+    width: min(340px, calc(100vw - 28px));
+    padding: 14px 16px;
+    pointer-events: none;
+  }
+  h1 { margin: 0; font-size: 17px; letter-spacing: 0.01em; }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    flex: none;
+    border-radius: 50%;
+    background: #2bb673;
+    box-shadow: 0 0 0 4px rgba(43, 182, 115, 0.2);
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .stats {
+    margin-top: 6px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+  }
+  .hint {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(16, 38, 61, 0.12);
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+  .destination-picker { margin-top: 12px; pointer-events: auto; }
+  .destination-picker label { display: block; margin-bottom: 5px; font-size: 12px; font-weight: 600; }
+  .destination-picker select {
+    width: 100%; min-height: 44px; padding: 8px 10px;
+    border: 1px solid rgba(16, 38, 61, 0.2); border-radius: 10px;
+    background: #fff; color: var(--ink); font: inherit; font-size: 14px;
+  }
+  .destination-picker select:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .destination-picker select:disabled { opacity: 0.65; }
+  .destination-description { margin: 5px 0 0; font-size: 12px; line-height: 1.4; }
+  @media (pointer: coarse) { .kbd { display: none; } }
+
+  .dock {
+    position: fixed;
+    left: 50%;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + var(--v-offset-bottom, 0px));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    max-width: calc(100vw - max(24px, env(safe-area-inset-left) + env(safe-area-inset-right)));
+    border-radius: 20px;
+  }
+  button {
+    font: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+    background: #fff;
+    border: 0;
+    border-radius: 12px;
+    min-height: 48px;
+    min-width: 48px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(16, 38, 61, 0.12);
+    transition: transform 0.1s ease, background-color 0.2s, opacity 0.2s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  button[hidden] { display: none; }
+  button:hover:not(:disabled) { background: #eef6ff; }
+  button:active:not(:disabled) { transform: scale(0.96); }
+  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  button:disabled { opacity: 0.55; cursor: default; }
+  button.icon { width: 48px; padding: 0; font-size: 22px; line-height: 1; }
+  button.primary {
+    background: var(--accent);
+    color: #fff;
+    min-width: 150px;
+    box-shadow: 0 6px 18px rgba(255, 122, 47, 0.4);
+  }
+  button.primary:hover:not(:disabled) { background: #ff8a4d; }
+  .sep { width: 1px; height: 28px; margin: 0 4px; background: rgba(16, 38, 61, 0.15); }
+  @media (max-width: 520px), (max-height: 500px) {
+    .dock { width: max-content; flex-wrap: wrap; justify-content: center; }
+    button.primary { min-width: 124px; }
+    .label { display: none; }
+    .sep { display: none; }
+  }
+  @media (max-height: 500px) {
+    .dock {
+      bottom: max(8px, env(safe-area-inset-bottom));
+      bottom: calc(max(8px, env(safe-area-inset-bottom)) + var(--v-offset-bottom, 0px));
+      padding: 6px;
+      gap: 6px;
+      border-radius: 16px;
+    }
+    button {
+      min-height: 40px;
+      min-width: 40px;
+      padding: 0 10px;
+      font-size: 14px;
+      border-radius: 10px;
+    }
+    button.icon {
+      width: 40px;
+      font-size: 20px;
+    }
+    button.primary {
+      min-width: 108px;
+    }
+    .hud {
+      top: max(8px, env(safe-area-inset-top));
+      left: max(8px, env(safe-area-inset-left));
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+    h1 { font-size: 15px; }
+    .status { margin-top: 4px; font-size: 13px; }
+    .stats { margin-top: 4px; font-size: 11px; }
+    .destination-picker { margin-top: 8px; }
+    .destination-description, .hint .kbd { display: none; }
+    .hint {
+      margin-top: 6px;
+      padding-top: 6px;
+      font-size: 11px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="scene" aria-label="3D view of a spaceship hovering above a landing pad"></canvas>
+
+<div class="hud panel">
+  <h1>Landing Pad Alpha</h1>
+  <div class="status" aria-live="polite"><span class="dot" id="dot"></span><span id="statusText">Loading 3D scene…</span></div>
+  <div class="stats" id="stats"></div>
+  <div class="destination-picker">
+    <label for="destinationSelect">Destination</label>
+    <select id="destinationSelect" aria-describedby="destinationDescription">
+      <option value="aurelia">Aurelia · Ringed planet</option>
+      <option value="ember">Ember Reach · Crystal field</option>
+    </select>
+    <p id="destinationDescription" class="destination-description">A blue planet framed by luminous rings.</p>
+  </div>
+  <div class="hint">
+    Drag to orbit · Scroll or pinch to zoom
+    <div class="kbd">Space: depart · +/−: zoom · R: reset view</div>
+  </div>
+</div>
+
+<div class="dock panel" role="toolbar" aria-label="Flight controls">
+  <button id="departBtn" class="primary">Depart</button>
+  <button id="pauseBtn" hidden>Pause</button>
+  <span class="sep"></span>
+  <button id="zoomOut" class="icon" aria-label="Zoom out">−</button>
+  <button id="zoomIn" class="icon" aria-label="Zoom in">+</button>
+  <button id="resetBtn" aria-label="Reset camera"><span aria-hidden="true">⟲</span><span class="label">Reset view</span></button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ---------- Tunables ----------
+const PAD_RADIUS = 7.5;
+const LAP_RADIUS = 12;
+const LAP_TIME = 20;            // seconds for one slow lap
+const SPIRAL_TIME = 3;          // seconds to ease out to lap radius
+const HOVER_ALT = 3.2;
+const LAP_SPEED = (2 * Math.PI * LAP_RADIUS) / LAP_TIME;
+const CHASE_DISTANCE = 20;
+const RESET_TIME = 1.2;
+const HOME_TARGET = new THREE.Vector3(0, HOVER_ALT, 0); // aim at the hovering ship so it stays centred when orbiting or zooming
+const HOME_OFFSET = new THREE.Vector3(22, 12, 30);
+
+// ---------- Helpers ----------
+const $ = (id) => document.getElementById(id);
+const smooth = (x) => x * x * (3 - 2 * x);
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647; // seeded so the scenery is stable
+
+function mk(geo, mat, parent, x = 0, y = 0, z = 0) {
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(x, y, z);
+  m.castShadow = true;
+  m.receiveShadow = true;
+  parent.add(m);
+  return m;
+}
+
+function glowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grd.addColorStop(0, 'rgba(255,255,255,1)');
+  grd.addColorStop(0.25, 'rgba(255,255,255,0.45)');
+  grd.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 128, 128);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+const glowTex = glowTexture();
+
+// Terrain height in plane space (plane x, plane y = -world z). Shared by the ground and anything placed on it.
+function hillH(px, py) {
+  const k = THREE.MathUtils.smoothstep(Math.hypot(px, py), 35, 90);
+  return (Math.sin(px * 0.011) * Math.cos(py * 0.013) * 5 + Math.sin(px * 0.037 + py * 0.023) * 1.4) * k;
+}
+const groundY = (x, z) => hillH(x, -z);
+
+// ---------- Renderer / scene / camera ----------
+const canvas = $('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xcfeaff, 380, 1500);
+
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 6000);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.enablePan = false;
+controls.minDistance = 8;
+controls.maxDistance = 160;
+controls.maxPolarAngle = Math.PI * 0.47;
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
+controls.target.copy(HOME_TARGET);
+
+// ---------- Sky ----------
+const sky = new THREE.Mesh(
+  new THREE.SphereGeometry(2500, 32, 20),
+  new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    depthWrite: false,
+    fog: false,
+    uniforms: {
+      zenith: { value: new THREE.Color(0x2a7fd6) },
+      horizon: { value: new THREE.Color(0xd4ecff) },
+      sunDir: { value: new THREE.Vector3(60, 120, 40).normalize() },
+      space: { value: 0 },
+    },
+    vertexShader: `
+      varying vec3 vDir;
+      void main() {
+        vDir = normalize(position);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: `
+      uniform vec3 zenith;
+      uniform vec3 horizon;
+      uniform vec3 sunDir;
+      uniform float space;
+      varying vec3 vDir;
+      void main() {
+        float h = clamp(vDir.y, 0.0, 1.0);
+        vec3 col = mix(horizon, zenith, pow(h, 0.55));
+        float s = max(dot(vDir, normalize(sunDir)), 0.0);
+        col += vec3(1.0, 0.93, 0.78) * (pow(s, 400.0) * 1.2 + pow(s, 6.0) * 0.12);
+        col = mix(col, vec3(0.002, 0.004, 0.025), space);
+        gl_FragColor = vec4(col, 1.0);
+        #include <colorspace_fragment>
+      }`,
+  })
+);
+sky.renderOrder = -1;
+scene.add(sky);
+
+// The star field follows the camera like the sky, so it remains distant throughout flight.
+const starPositions = [];
+for (let i = 0; i < 1800; i++) {
+  const y = rnd() * 2 - 1, a = rnd() * Math.PI * 2;
+  const r = Math.sqrt(1 - y * y) * 2300;
+  starPositions.push(Math.cos(a) * r, y * 2300, Math.sin(a) * r);
+}
+const starGeo = new THREE.BufferGeometry();
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
+  color: 0xdcecff, size: 4, transparent: true, opacity: 0, depthWrite: false, fog: false,
+}));
+stars.frustumCulled = false;
+scene.add(stars);
+
+// Each destination has its own scenery and teleport anchor.
+const destination = new THREE.Group();
+destination.position.set(8000, 2200, 8200);
+scene.add(destination);
+const planet = new THREE.Mesh(new THREE.SphereGeometry(170, 48, 32),
+  new THREE.MeshStandardMaterial({ color: 0x5f9cba, roughness: 0.9, emissive: 0x102c45, emissiveIntensity: 0.35 }));
+planet.position.set(80, -100, 550);
+destination.add(planet);
+const planetRing = new THREE.Mesh(new THREE.RingGeometry(215, 295, 96),
+  new THREE.MeshBasicMaterial({ color: 0xc8e3dc, side: THREE.DoubleSide, transparent: true, opacity: 0.45, fog: false }));
+planetRing.position.copy(planet.position);
+planetRing.rotation.set(1.15, 0.2, 0.25);
+destination.add(planetRing);
+
+const emberDestination = new THREE.Group();
+emberDestination.position.set(-8200, 2600, 8100);
+scene.add(emberDestination);
+const emberPlanet = new THREE.Mesh(new THREE.SphereGeometry(145, 48, 32),
+  new THREE.MeshStandardMaterial({ color: 0xd25b36, roughness: 0.95, emissive: 0x7d200c, emissiveIntensity: 0.5 }));
+emberPlanet.position.set(-240, 90, 620);
+emberDestination.add(emberPlanet);
+const moon = new THREE.Mesh(new THREE.SphereGeometry(48, 24, 16),
+  new THREE.MeshStandardMaterial({ color: 0xd8bda4, roughness: 1 }));
+moon.position.set(190, 130, 720);
+emberDestination.add(moon);
+const crystalMat = new THREE.MeshStandardMaterial({ color: 0xa986ff, metalness: 0.35,
+  roughness: 0.25, emissive: 0x6030b8, emissiveIntensity: 0.8, flatShading: true });
+const asteroidMat = new THREE.MeshStandardMaterial({ color: 0x52465c, roughness: 1, flatShading: true });
+for (let i = 0; i < 32; i++) {
+  const a = i / 32 * Math.PI * 2;
+  const r = 65 + rnd() * 160;
+  const rock = mk(new THREE.IcosahedronGeometry(4 + rnd() * 7, 0), asteroidMat, emberDestination,
+    Math.cos(a) * r, 40 + rnd() * 120, 280 + Math.sin(a) * r);
+  rock.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3);
+  const crystal = mk(new THREE.OctahedronGeometry(3 + rnd() * 3, 0), crystalMat, emberDestination,
+    rock.position.x, rock.position.y + 8, rock.position.z);
+  crystal.scale.y = 2.5;
+  crystal.rotation.z = (rnd() - 0.5) * 0.7;
+}
+const DESTINATIONS = {
+  aurelia: { name: 'Aurelia', description: 'A blue planet framed by luminous rings.', scene: destination },
+  ember: { name: 'Ember Reach', description: 'Violet crystals drift beneath a red planet and its moon.', scene: emberDestination },
+};
+Object.values(DESTINATIONS).forEach((place) => { place.scene.visible = false; });
+
+// ---------- Lights ----------
+scene.add(new THREE.HemisphereLight(0xdff1ff, 0x6b8f3c, 1.1));
+const sun = new THREE.DirectionalLight(0xfff3d6, 2.4);
+sun.position.set(60, 120, 40);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -60, right: 60, top: 60, bottom: -60, near: 10, far: 320 });
+sun.shadow.camera.updateProjectionMatrix();
+sun.shadow.bias = -0.0005;
+sun.shadow.normalBias = 0.03;
+scene.add(sun);
+
+// ---------- Ground ----------
+const groundGeo = new THREE.PlaneGeometry(4000, 4000, 200, 200);
+const gp = groundGeo.attributes.position;
+for (let i = 0; i < gp.count; i++) gp.setZ(i, hillH(gp.getX(i), gp.getY(i)));
+groundGeo.computeVertexNormals();
+groundGeo.rotateX(-Math.PI / 2);
+const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x7fb85c, roughness: 1 }));
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ---------- Landing pad ----------
+const concreteMat = new THREE.MeshStandardMaterial({ color: 0xa9b1b8, roughness: 0.85 });
+const paintMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 });
+const amberMat = new THREE.MeshStandardMaterial({ color: 0xffb020, roughness: 0.5 });
+const padGroup = new THREE.Group();
+scene.add(padGroup);
+mk(new THREE.CylinderGeometry(PAD_RADIUS, PAD_RADIUS + 0.4, 0.5, 72), concreteMat, padGroup, 0, 0.25, 0);
+mk(new THREE.TorusGeometry(PAD_RADIUS, 0.12, 8, 96), amberMat, padGroup, 0, 0.5, 0).rotation.x = Math.PI / 2;
+
+const H = new THREE.Group();
+H.position.y = 0.505;
+padGroup.add(H);
+mk(new THREE.BoxGeometry(0.45, 0.02, 4.4), paintMat, H, -1.2, 0, 0);
+mk(new THREE.BoxGeometry(0.45, 0.02, 4.4), paintMat, H, 1.2, 0, 0);
+mk(new THREE.BoxGeometry(2.4, 0.02, 0.45), paintMat, H, 0, 0, 0);
+
+const edgeGeo = new THREE.SphereGeometry(0.16, 10, 8);
+const edgeMat = new THREE.MeshBasicMaterial({ color: 0xffd98a });
+for (let i = 0; i < 28; i++) {
+  const a = (i / 28) * Math.PI * 2;
+  const l = new THREE.Mesh(edgeGeo, edgeMat);
+  l.position.set(Math.cos(a) * (PAD_RADIUS - 0.35), 0.55, Math.sin(a) * (PAD_RADIUS - 0.35));
+  padGroup.add(l);
+}
+
+// ---------- Surroundings ----------
+const wallMat = new THREE.MeshStandardMaterial({ color: 0xe6e9ee, roughness: 0.7 });
+const roofMat = new THREE.MeshStandardMaterial({ color: 0x8c98a5, roughness: 0.6 });
+const doorMat = new THREE.MeshStandardMaterial({ color: 0x3a4654, roughness: 0.8 });
+const towerMat = new THREE.MeshStandardMaterial({ color: 0xdfe4ea, roughness: 0.5 });
+const glassMat = new THREE.MeshStandardMaterial({ color: 0x1c4a7a, metalness: 0.9, roughness: 0.08 });
+
+// Hangar
+const hangar = new THREE.Group();
+hangar.position.set(-26, 0, 8);
+scene.add(hangar);
+mk(new THREE.BoxGeometry(16, 6, 11), wallMat, hangar, 0, 3, 0);
+const roofShape = new THREE.Shape();
+roofShape.moveTo(-8.6, 0);
+roofShape.lineTo(8.6, 0);
+roofShape.lineTo(0, 4.8);
+roofShape.closePath();
+mk(new THREE.ExtrudeGeometry(roofShape, { depth: 11.4, bevelEnabled: false }), roofMat, hangar, 0, 6, -5.7);
+mk(new THREE.BoxGeometry(8, 4.5, 0.2), doorMat, hangar, 0, 2.25, 5.55);
+
+// Control tower
+const tower = new THREE.Group();
+tower.position.set(-17, 0, -16);
+scene.add(tower);
+mk(new THREE.CylinderGeometry(0.6, 0.9, 16, 12), towerMat, tower, 0, 8, 0);
+mk(new THREE.CylinderGeometry(2, 1.6, 2.4, 16), glassMat, tower, 0, 17.2, 0);
+mk(new THREE.CylinderGeometry(0.06, 0.06, 3, 6), towerMat, tower, 0, 19.5, 0);
+const beacon = mk(new THREE.SphereGeometry(0.2, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff3b3b }), tower, 0, 21.2, 0);
+beacon.castShadow = false;
+
+// Trees and bushes
+const foliageMats = [0x3f8f3a, 0x4e9b40, 0x2f7a3a].map(
+  (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, flatShading: true })
+);
+const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6b4a2b, roughness: 1 });
+const bushMat = new THREE.MeshStandardMaterial({ color: 0x5fa64a, roughness: 0.9, flatShading: true });
+
+function addTree(x, z, s) {
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22 * s, 0.32 * s, 2 * s, 6), trunkMat);
+  trunk.position.y = s;
+  const crown = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.7 * s, 0),
+    foliageMats[Math.floor(rnd() * foliageMats.length)]
+  );
+  crown.position.y = 3.1 * s;
+  crown.scale.y = 1.2;
+  g.add(trunk, crown);
+  g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  g.position.set(x, groundY(x, z), z);
+  scene.add(g);
+}
+for (let i = 0; i < 150; i++) {
+  const a = rnd() * Math.PI * 2;
+  const d = 26 + Math.pow(rnd(), 0.8) * 380;
+  const x = Math.cos(a) * d, z = Math.sin(a) * d;
+  if (Math.hypot(x + 26, z - 8) < 14 || Math.hypot(x + 17, z + 16) < 6) continue;
+  addTree(x, z, 0.8 + rnd() * 0.9);
+}
+for (let i = 0; i < 70; i++) {
+  const a = rnd() * Math.PI * 2;
+  const d = 24 + rnd() * 300;
+  const x = Math.cos(a) * d, z = Math.sin(a) * d;
+  const r = 0.5 + rnd() * 0.6;
+  const bush = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 0), bushMat);
+  bush.position.set(x, groundY(x, z) + r * 0.4, z);
+  bush.castShadow = bush.receiveShadow = true;
+  scene.add(bush);
+}
+
+// Distant mountains, kept clear of the departure heading (+Z, i.e. angle π/2)
+const rockMat = new THREE.MeshStandardMaterial({ color: 0x7b8aa0, roughness: 1, flatShading: true });
+const snowMat = new THREE.MeshStandardMaterial({ color: 0xf5f9ff, roughness: 0.7, flatShading: true });
+for (let i = 0; i < 26; i++) {
+  const a = (i / 26) * Math.PI * 2 + rnd() * 0.15;
+  if (Math.abs(Math.atan2(Math.sin(a), Math.cos(a)) - Math.PI / 2) < 0.7) continue;
+  const d = 1100 + rnd() * 350;
+  const h = 260 + rnd() * 260;
+  const r = h * (0.75 + rnd() * 0.4);
+  const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 7), rockMat);
+  m.position.set(Math.cos(a) * d, h / 2 - 20, Math.sin(a) * d);
+  scene.add(m);
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(r * 0.36, h * 0.28, 7), snowMat);
+  cap.position.set(m.position.x, m.position.y + h / 2 - h * 0.14, m.position.z);
+  scene.add(cap);
+}
+
+// Clouds
+const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, emissive: 0x9fb3c8, emissiveIntensity: 0.15 });
+for (let i = 0; i < 18; i++) {
+  const cloud = new THREE.Group();
+  const n = 4 + Math.floor(rnd() * 4);
+  for (let j = 0; j < n; j++) {
+    const puff = new THREE.Mesh(new THREE.SphereGeometry(10 + rnd() * 8, 14, 10), cloudMat);
+    puff.position.set((j - n / 2) * 12 + rnd() * 6, rnd() * 5, rnd() * 8 - 4);
+    cloud.add(puff);
+  }
+  const a = rnd() * Math.PI * 2, d = 180 + rnd() * 700;
+  cloud.position.set(Math.cos(a) * d, 90 + rnd() * 60, Math.sin(a) * d);
+  scene.add(cloud);
+}
+
+// ---------- Ship ----------
+// Local frame: nose along +Z, up +Y.
+const ship = new THREE.Group();
+ship.rotation.order = 'YXZ';
+scene.add(ship);
+
+const hullMat = new THREE.MeshStandardMaterial({ color: 0xf4f7fa, metalness: 0.4, roughness: 0.3 });
+const accentMat = new THREE.MeshStandardMaterial({ color: 0xff7a2f, metalness: 0.2, roughness: 0.4 });
+const darkMat = new THREE.MeshStandardMaterial({ color: 0x2b3440, metalness: 0.6, roughness: 0.5 });
+
+const hullProfile = [[0.01, -1.9], [0.45, -1.5], [0.72, -0.8], [0.82, 0], [0.72, 0.9], [0.45, 1.6], [0.14, 2.2], [0.01, 2.4]]
+  .map(([x, y]) => new THREE.Vector2(x, y));
+mk(new THREE.LatheGeometry(hullProfile, 32).rotateX(Math.PI / 2), hullMat, ship);
+mk(new THREE.SphereGeometry(0.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), glassMat, ship, 0, 0.6, 0.9).scale.set(0.95, 0.75, 1.5);
+
+const wingShape = new THREE.Shape();
+wingShape.moveTo(0.4, -0.9);
+wingShape.lineTo(2.1, 0.8);
+wingShape.lineTo(0.4, 1.1);
+wingShape.closePath();
+const wingGeo = new THREE.ExtrudeGeometry(wingShape, { depth: 0.08, bevelEnabled: false }).rotateX(-Math.PI / 2);
+mk(wingGeo, hullMat, ship, 0, -0.2, 0);
+mk(wingGeo, hullMat, ship, 0, -0.2, 0).scale.x = -1;
+
+mk(new THREE.BoxGeometry(0.08, 1.2, 1.0), accentMat, ship, 0, 0.7, -1.4);
+mk(new THREE.CylinderGeometry(0.42, 0.5, 0.4, 20).rotateX(Math.PI / 2), darkMat, ship, 0, 0, -2.1);
+
+// Navigation lights at the wingtips
+const navRed = new THREE.MeshBasicMaterial({ color: 0xff4040 });
+const navGreen = new THREE.MeshBasicMaterial({ color: 0x40ff80 });
+mk(new THREE.SphereGeometry(0.1, 8, 6), navRed, ship, -2.1, -0.2, -0.8).castShadow = false;
+mk(new THREE.SphereGeometry(0.1, 8, 6), navGreen, ship, 2.1, -0.2, -0.8).castShadow = false;
+
+// Engine flame and glow (no shadows)
+const flameMat = new THREE.MeshBasicMaterial({
+  color: 0xffa64d, transparent: true, opacity: 0.8,
+  blending: THREE.AdditiveBlending, depthWrite: false,
+});
+const flame = new THREE.Mesh(new THREE.ConeGeometry(0.4, 1.8, 16, 1, true).rotateX(-Math.PI / 2), flameMat);
+ship.add(flame);
+const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: glowTex, color: 0xffb070, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+}));
+glow.position.z = -2.5;
+ship.add(glow);
+
+// Expanding luminous rings and a central flash make the jump legible from any angle.
+const jumpEffect = new THREE.Group();
+ship.add(jumpEffect);
+const jumpRings = [];
+for (let i = 0; i < 3; i++) {
+  const ring = new THREE.Mesh(new THREE.TorusGeometry  (2.8 + i * 0.7, 0.12, 12, 64),
+    new THREE.MeshBasicMaterial({ color: 0x75eaff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+  ring.position.z = (i - 1) * 1.8;
+  jumpEffect.add(ring);
+  jumpRings.push(ring);
+}
+const jumpFlash = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0x9cefff,
+  transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+jumpEffect.add(jumpFlash);
+
+
+// Exhaust trail
+const trailPts = [];
+const trailLine = new THREE.Line(
+  new THREE.BufferGeometry(),
+  new THREE.LineBasicMaterial({ color: 0xbff3ff, transparent: true, opacity: 0.8 })
+);
+trailLine.frustumCulled = false;
+scene.add(trailLine);
+const _tail = new THREE.Vector3();
+function pushTrail() {
+  _tail.set(0, 0, -2.4).applyQuaternion(ship.quaternion).add(ship.position);
+  const last = trailPts[trailPts.length - 1];
+  if (!last || last.distanceTo(_tail) > 0.35) {
+    trailPts.push(_tail.clone());
+    if (trailPts.length > 260) trailPts.shift();
+    trailLine.geometry.setFromPoints(trailPts);
+  }
+}
+
+// ---------- Flight state ----------
+// modes: hover → lap → depart → away (the ship never returns)
+const state = {
+  mode: 'hover',
+  lapT: 0,
+  departT: 0,
+  speed: 0,
+  thrust: 0.25,
+  pos: new THREE.Vector3(0, HOVER_ALT, 0),
+  dir: new THREE.Vector3(0, 0, 1),
+  followShip: false,
+  followW: 0,         // 0 = orbit centre on pad, 1 = orbit centre on ship
+  userControl: false, // true once the user orbits/zooms; stops the automatic chase camera
+  paused: false,
+  jumped: false,
+  destination: 'aurelia',
+};
+const _climb = new THREE.Vector3(0, 0.4, 1);
+const _dir = new THREE.Vector3();
+
+function updateFlight(dt, t) {
+  const s = state;
+  let thrustTarget = 0.25;
+  let pitch = 0, yaw = 0, roll = 0;
+
+  if (s.mode === 'hover') {
+    s.pos.set(0, HOVER_ALT + Math.sin(t * 1.3) * 0.12, 0);
+    pitch = Math.sin(t * 0.9) * 0.03;
+    roll = Math.sin(t * 0.7) * 0.04;
+  } else if (s.mode === 'lap') {
+    s.lapT += dt;
+    const ease = smooth(Math.min(s.lapT / SPIRAL_TIME, 1));
+    const a = (s.lapT / LAP_TIME) * Math.PI * 2;
+    const r = LAP_RADIUS * ease;
+    s.pos.set(Math.cos(a) * r, HOVER_ALT + Math.sin(t * 1.3) * 0.08, Math.sin(a) * r);
+    yaw = -a;                 // nose follows the tangent of the circle
+    roll = 0.3 * ease;        // bank into the turn
+    thrustTarget = 0.5;
+    if (s.lapT >= LAP_TIME) {
+      s.mode = 'depart';
+      s.departT = 0;
+      s.speed = LAP_SPEED;
+      s.followShip = true;
+      s.dir.set(0, 0, 1);
+      s.pos.set(LAP_RADIUS, HOVER_ALT, 0); // exact lap end, leaves the circle tangentially
+    }
+  } else {
+    s.departT += dt;
+    s.speed = s.mode === 'away' ? 25 : Math.min(s.speed + (8 + 6 * s.departT) * dt, 220);
+    const blend = smooth(Math.min(s.departT / 4, 1));
+    s.dir.copy(_dir.set(0, 0, 1).lerp(_climb, blend)).normalize();
+    s.pos.addScaledVector(s.dir, s.speed * dt);
+    pitch = -Math.asin(s.dir.y);
+    yaw = Math.atan2(s.dir.x, s.dir.z);
+    roll = 0.3 * (1 - smooth(Math.min(s.departT / 1.5, 1)));
+    thrustTarget = 1 + Math.sin(t * 40) * 0.04;
+    s.followW = Math.min(1, s.followW + dt / 1.5);
+    if (s.mode === 'depart' && s.departT > 8) s.mode = 'climb';
+    if (s.mode === 'climb' && s.departT > 16) s.mode = 'jump';
+    if (s.mode === 'jump' && s.departT >= 17.2 && !s.jumped) {
+      // Move the camera by the same displacement so orbit and zoom survive the jump.
+      const arrival = DESTINATIONS[s.destination];
+      arrival.scene.visible = true;
+      const shift = arrival.scene.position.clone().sub(s.pos);
+      s.pos.add(shift);
+      camera.position.add(shift);
+      controls.target.add(shift);
+      if (resetAnim) resetAnim.target.add(shift);
+      s.jumped = true;
+      trailPts.length = 0;
+      trailLine.geometry.setFromPoints(trailPts);
+    }
+    if (s.mode === 'jump' && s.departT > 18.4) {
+      s.mode = 'away';
+      s.speed = 25;
+    }
+    if (s.mode === 'away') s.speed = 25;
+  }
+
+  ship.position.copy(s.pos);
+  ship.rotation.set(pitch, yaw, roll);
+
+  s.thrust += (thrustTarget - s.thrust) * (1 - Math.exp(-dt * 5));
+  const len = 0.5 + s.thrust * 1.6;
+  flame.scale.set(0.8 + s.thrust * 0.35, 0.8 + s.thrust * 0.35, len / 1.8);
+  flame.position.z = -2.3 - len / 2;
+  flameMat.opacity = 0.55 + 0.3 * Math.min(s.thrust, 1);
+  glow.scale.setScalar(1.2 + s.thrust * 1.4);
+
+  const space = s.mode === 'hover' || s.mode === 'lap' ? 0 : smooth(THREE.MathUtils.clamp((s.departT - 7) / 7, 0, 1));
+  sky.material.uniforms.space.value = space;
+  stars.material.opacity = space;
+  scene.fog.color.set(0xcfeaff).lerp(new THREE.Color(0x020619), space);
+  scene.fog.near = THREE.MathUtils.lerp(380, 3500, space);
+  scene.fog.far = THREE.MathUtils.lerp(1500, 5900, space);
+  const jump = s.mode === 'jump' ? Math.sin(Math.PI * THREE.MathUtils.clamp((s.departT - 16) / 2.4, 0, 1)) : 0;
+  jumpRings.forEach((ring, i) => {
+    ring.material.opacity = jump * 0.9;
+    ring.scale.setScalar(1 + jump * (0.8 + i * 0.25));
+    ring.rotation.z = t * (i % 2 ? -1 : 1);
+  });
+  jumpFlash.material.opacity = jump * 0.9;
+  jumpFlash.scale.setScalar(3 + jump * 20);
+  if (s.mode !== 'hover') pushTrail();
+}
+
+// ---------- Camera ----------
+const homeOff = new THREE.Vector3();
+const _offset = new THREE.Vector3();
+const _goal = new THREE.Vector3();
+const _chase = new THREE.Vector3();
+let resetAnim = null;
+let pendingZoom = 1;   // multiplicative zoom eased in over several frames (buttons, keys, taps)
+let zoomHold = 0;      // -1 zoom in, +1 zoom out while a zoom button is held
+
+function chaseOffset() {
+  // Sit behind the ship's heading, slightly above
+  return _chase.set(-state.dir.x * CHASE_DISTANCE, 6, -state.dir.z * CHASE_DISTANCE);
+}
+
+function updateCamera(dt) {
+  const offset = _offset.subVectors(camera.position, controls.target);
+
+  // Orbit centre: the pad until departure, then blends onto the ship
+  _goal.lerpVectors(HOME_TARGET, state.pos, smooth(state.followW));
+
+  if (resetAnim) {
+    resetAnim.t = Math.min(1, resetAnim.t + dt / RESET_TIME);
+    const k = easeInOut(resetAnim.t);
+    offset.lerpVectors(resetAnim.offset, state.followShip ? chaseOffset() : homeOff, k);
+    controls.target.lerpVectors(resetAnim.target, _goal, k);
+    if (resetAnim.t >= 1) resetAnim = null;
+  } else {
+    if (state.followShip && !state.userControl) {
+      offset.lerp(chaseOffset(), 1 - Math.exp(-dt * 1.5));
+    }
+    controls.target.copy(_goal);
+  }
+
+  // Zoom: held buttons zoom continuously, taps ease in
+  if (zoomHold) offset.multiplyScalar(Math.pow(1.6, zoomHold * dt));
+  if (pendingZoom !== 1) {
+    const step = Math.pow(pendingZoom, 1 - Math.exp(-dt * 10));
+    offset.multiplyScalar(step);
+    pendingZoom /= step;
+    if (Math.abs(Math.log(pendingZoom)) < 0.001) pendingZoom = 1;
+  }
+  offset.setLength(THREE.MathUtils.clamp(offset.length(), controls.minDistance, controls.maxDistance));
+
+  camera.position.copy(controls.target).add(offset);
+  controls.update();
+}
+
+function computeHomeOffset() {
+  // On portrait screens, pull back so the pad and its lap fit horizontally
+  const vTan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const needed = 24 / (vTan * camera.aspect);
+  homeOff.copy(HOME_OFFSET).setLength(Math.max(HOME_OFFSET.length(), needed));
+}
+
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 0.9 ? 60 : 50;
+  camera.updateProjectionMatrix();
+  computeHomeOffset();
+}
+window.addEventListener('resize', resize);
+resize();
+
+function updateVisualViewport() {
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const offsetBottom = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+    document.documentElement.style.setProperty('--v-offset-bottom', `${offsetBottom}px`);
+  }
+  window.scrollTo(0, 0);
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateVisualViewport);
+  window.visualViewport.addEventListener('scroll', updateVisualViewport);
+}
+window.addEventListener('resize', updateVisualViewport);
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    updateVisualViewport();
+    resize();
+  }, 100);
+});
+updateVisualViewport();
+camera.position.copy(HOME_TARGET).add(homeOff);
+controls.update();
+
+function markUserControl() {
+  state.userControl = true;
+  resetAnim = null;
+}
+controls.addEventListener('start', markUserControl);
+
+function resetCamera() {
+  state.userControl = false;
+  resetAnim = {
+    t: 0,
+    offset: camera.position.clone().sub(controls.target),
+    target: controls.target.clone(),
+  };
+}
+
+function zoomStep(dir) {
+  // dir < 0 zooms in, dir > 0 zooms out
+  return dir < 0 ? 1 / 1.2 : 1.2;
+}
+
+// ---------- Controls ----------
+function startDeparture() {
+  if (state.mode === 'away') {
+    Object.values(DESTINATIONS).forEach((place) => { place.scene.visible = false; });
+    state.mode = 'hover';
+    state.lapT = 0;
+    state.departT = 0;
+    state.speed = 0;
+    state.thrust = 0.25;
+    state.pos.set(0, HOVER_ALT, 0);
+    state.dir.set(0, 0, 1);
+    state.followShip = false;
+    state.followW = 0;
+    state.paused = false;
+    state.jumped = false;
+    flightTime = 0;
+    trailPts.length = 0;
+    trailLine.geometry.setFromPoints(trailPts);
+    resetCamera();
+  }
+  if (state.mode !== 'hover') return;
+  state.destination = $('destinationSelect').value;
+  $('destinationSelect').disabled = true;
+  state.mode = 'lap';
+  state.lapT = 0;
+}
+
+$('destinationSelect').addEventListener('change', () => {
+  $('destinationDescription').textContent = DESTINATIONS[$('destinationSelect').value].description;
+});
+
+departBtn.addEventListener('click', startDeparture);
+$('pauseBtn').addEventListener('click', () => {
+  state.paused = !state.paused;
+});
+resetBtn.addEventListener('click', resetCamera);
+
+function bindZoom(btn, dir) {
+  btn.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    markUserControl();
+    zoomHold = dir;
+    pendingZoom *= zoomStep(dir);
+  });
+  const stop = () => { zoomHold = 0; };
+  btn.addEventListener('pointerup', stop);
+  btn.addEventListener('pointerleave', stop);
+  btn.addEventListener('pointercancel', stop);
+  // Keyboard activation fires click with detail 0 (pointer clicks are handled above)
+  btn.addEventListener('click', (e) => {
+    if (e.detail === 0) { markUserControl(); pendingZoom *= zoomStep(dir); }
+  });
+}
+bindZoom($('zoomIn'), -1);
+bindZoom($('zoomOut'), 1);
+
+window.addEventListener('keydown', (e) => {
+  if (['SELECT', 'INPUT', 'TEXTAREA'].includes(e.target.tagName) || e.target.isContentEditable) return;
+  if (e.key === ' ' && e.target.tagName !== 'BUTTON') {
+    e.preventDefault();
+    startDeparture();
+  } else if (e.key === 'r' || e.key === 'R') {
+    resetCamera();
+  } else if (e.key === '+' || e.key === '=') {
+    markUserControl();
+    pendingZoom *= zoomStep(-1);
+  } else if (e.key === '-' || e.key === '_') {
+    markUserControl();
+    pendingZoom *= zoomStep(1);
+  }
+});
+
+// ---------- HUD ----------
+const STATUS = {
+  hover: { text: 'Hovering over the pad', color: '#2bb673' },
+  lap: { text: 'Slow lap around the pad', color: '#f5b400' },
+  depart: { text: 'Departing', color: '#ff7a2f' },
+  climb: { text: 'Climbing into space', color: '#6a9ce8' },
+  jump: { text: 'Jumping to destination', color: '#69d9ee' },
+  away: { text: 'Arrived at destination', color: '#2f8fe0' },
+};
+let shownMode = '';
+let shownPaused = null;
+let lastHud = -1;
+function updateHud(t) {
+  if (state.mode !== shownMode || state.paused !== shownPaused) {
+    shownMode = state.mode;
+    shownPaused = state.paused;
+    const st = STATUS[state.mode];
+    const place = DESTINATIONS[state.destination];
+    const text = state.mode === 'away' ? `Arrived at ${place.name}` :
+      state.mode === 'jump' ? `Jumping to ${place.name}` : st.text;
+    $('statusText').textContent = state.paused ? `Paused · ${text}` : text;
+    $('destinationSelect').disabled = state.mode !== 'hover' && state.mode !== 'away';
+    $('dot').style.background = st.color;
+    $('dot').style.boxShadow = `0 0 0 4px ${st.color}33`;
+    departBtn.textContent = state.mode === 'hover' ? 'Depart' : state.mode === 'away' ? 'Replay' : 'Departing…';
+    departBtn.disabled = state.mode !== 'hover' && state.mode !== 'away';
+    $('pauseBtn').hidden = state.mode === 'hover';
+    $('pauseBtn').textContent = state.paused ? 'Resume' : 'Pause';
+  }
+  if (t - lastHud > 0.15) {
+    lastHud = t;
+    const speed = state.mode === 'hover' ? 0 : state.mode === 'lap' ? LAP_SPEED : state.speed;
+    const alt = Math.max(0, state.pos.y - 0.5);
+    const dist = state.pos.length();
+    $('stats').textContent =
+      `Altitude ${Math.round(alt)} m · Distance ${Math.round(dist).toLocaleString()} m · ${speed.toFixed(1)} m/s`;
+  }
+}
+
+// ---------- Loop ----------
+const clock = new THREE.Clock();
+let flightTime = 0;
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+  if (!state.paused) {
+    flightTime += dt;
+    updateFlight(dt, flightTime);
+  }
+  updateCamera(dt);
+  sky.position.copy(camera.position);
+  stars.position.copy(camera.position);
+  updateHud(t);
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

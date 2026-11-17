@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#d8eced"/><title>Solstice — A little further</title></head>
+<body><div id="app">
+  <canvas id="scene" aria-label="Interactive 3D scene of a spacecraft above a coastal landing pad"></canvas>
+  <div class="interface">
+    <header class="topbar"><a class="brand" href="#" aria-label="Solstice home"><span class="brand-mark">✳</span><span>SOLSTICE<small>FLIGHT OPERATIONS</small></span></a><div class="top-right"><span class="live-dot"></span> LIVE FROM PAD 04 <span class="divider"></span> <span class="coordinates">34° 08′ N &nbsp; / &nbsp; 118° 19′ W</span></div></header>
+    <main class="hero"><div class="eyebrow"><span></span> A SMALL SHIP, A BIG SKY</div><h1>Ready for<br/><em>somewhere</em> new.</h1><p>One quiet moment before the next great adventure. Whenever you’re ready, send the Solstice on its way.</p><div class="action-row"><button id="launch" class="launch"><span class="button-icon">↗</span><span>Begin departure</span><span class="button-arrow">→</span></button><div class="action-note">A LITTLE JOURNEY<br/><strong>ABOUT 30 SECONDS</strong></div></div></main>
+    <div class="flight-status"><div class="status-top"><span class="status-pulse"></span><span id="status-label">ALL SYSTEMS READY</span><span class="status-number">04 / 04</span></div><div class="status-line"><span id="progress"></span></div><div class="status-bottom"><span id="status-detail">Awaiting departure</span><span id="status-time">T — 00:00</span></div></div>
+    <aside class="side-label"><span>THE SOLSTICE</span><i></i> EXPLORATION VESSEL 01</aside>
+    <footer class="bottom"><div class="location"><span class="location-icon">✳</span><span>PAD 04 <small>COASTAL OBSERVATORY</small></span></div><div class="camera-controls"><span class="control-hint"><span class="mouse-icon">◉</span> DRAG TO ORBIT <b>·</b> SCROLL TO ZOOM</span><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="reset" class="reset" aria-label="Reset camera"><span>↺</span> RESET VIEW</button></div><div class="footer-index">01 <span>/</span> 03</div></footer>
+  </div>
+</div><script type="module" src="/src/main.js"></script></body></html>

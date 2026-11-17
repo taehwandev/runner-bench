@@ -1,0 +1,292 @@
+:root {
+  --text: #f4f8ff;
+  --glass: rgba(12, 24, 42, 0.5);
+  --glass-edge: rgba(255, 255, 255, 0.22);
+  --cyan: #7fe7ff;
+  --amber-1: #ffd98a;
+  --amber-2: #ff9d2e;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #bfe2ff;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+}
+
+#scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+#scene:active {
+  cursor: grabbing;
+}
+
+/* Thin progress line along the top edge, filled by the lap */
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--cyan), var(--amber-1));
+  transition: width 0.25s linear;
+}
+
+.hud {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 1px 8px rgba(0, 20, 50, 0.35);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.brand p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff 0 12%, var(--cyan) 30%, #2b6fe0 75%);
+  box-shadow: 0 0 18px rgba(127, 231, 255, 0.7);
+}
+
+.status {
+  margin: 0;
+  padding: 8px 14px;
+  max-width: min(60vw, 420px);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  backdrop-filter: blur(10px);
+}
+
+.dock {
+  position: absolute;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 20px;
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 12px 32px rgba(5, 20, 45, 0.28);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-primary {
+  min-width: 150px;
+  background: linear-gradient(180deg, var(--amber-1), var(--amber-2));
+  color: #2b1700;
+  border-color: transparent;
+  box-shadow: 0 8px 22px rgba(255, 157, 46, 0.45);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffe7ab, #ffab4d);
+}
+
+.btn-primary:disabled {
+  box-shadow: none;
+}
+
+.btn.toggle[aria-pressed="true"] {
+  background: rgba(127, 231, 255, 0.28);
+  border-color: rgba(127, 231, 255, 0.7);
+}
+
+.btn.icon {
+  width: 44px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.zoom {
+  display: flex;
+  gap: 6px;
+}
+
+.divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 2px;
+  background: var(--glass-edge);
+}
+
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(max(18px, env(safe-area-inset-bottom)) + 84px);
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 0.9;
+  text-shadow: 0 1px 6px rgba(0, 20, 50, 0.5);
+  pointer-events: none;
+}
+
+.hint-touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .hint-mouse {
+    display: none;
+  }
+
+  .hint-touch {
+    display: inline;
+  }
+}
+
+@media (max-width: 640px) {
+  .brand p,
+  .hide-sm {
+    display: none;
+  }
+
+  .status {
+    font-size: 13px;
+    max-width: 52vw;
+  }
+
+  .dock {
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    transform: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .dock .btn {
+    min-width: 0;
+    padding: 0 8px;
+  }
+
+  .dock .btn-primary {
+    grid-column: 1 / -1;
+    min-height: 52px;
+    font-size: 17px;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .zoom {
+    display: contents;
+  }
+
+  .dock .btn.icon {
+    width: auto;
+    font-size: 24px;
+  }
+
+  .hint {
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 178px);
+  }
+}
+
+/* Short screens: the hint would sit on top of the ship, so drop it */
+@media (max-height: 520px) {
+  .hint {
+    display: none;
+  }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Watch a small spaceship lift off from its landing pad, circle once, and fly away." />
+  <title>Skyport · Departure</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="stage">
+    <canvas id="scene" aria-label="3D scene: a spaceship hovering above a landing pad. Drag to orbit, scroll or pinch to zoom."></canvas>
+
+    <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
+
+    <header class="hud">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>Skyport</h1>
+          <p>Landing Pad 01</p>
+        </div>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite">Hovering over the pad</p>
+    </header>
+
+    <nav class="dock" aria-label="Scene controls">
+      <button id="launch" class="btn btn-primary" type="button">Launch</button>
+      <button id="follow" class="btn toggle" type="button" aria-pressed="false" title="Keep the camera locked on the ship (F)">Follow</button>
+      <button id="reset" class="btn" type="button" title="Return the camera to the home view (R)">Reset<span class="hide-sm">&nbsp;camera</span></button>
+      <span class="divider" aria-hidden="true"></span>
+      <div class="zoom" role="group" aria-label="Zoom">
+        <button id="zoom-out" class="btn icon" type="button" aria-label="Zoom out" title="Zoom out (-)">&minus;</button>
+        <button id="zoom-in" class="btn icon" type="button" aria-label="Zoom in" title="Zoom in (+)">+</button>
+      </div>
+    </nav>
+
+    <p class="hint">
+      <span class="hint-mouse">Drag to orbit · Scroll to zoom · Space launches · R resets · F follows</span>
+      <span class="hint-touch">Drag to orbit · Pinch to zoom</span>
+    </p>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="Interactive 3D spaceship test flight and landing experience">
+  <title>AeroScout-1 // 3D Spaceship Test Flight & Pad Landing</title>
+  <link rel="stylesheet" href="/src/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 3D Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- HUD Overlays -->
+  <header class="hud-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L15 8L21 9L17 14L18 20L12 17L6 20L7 14L3 9L9 8L12 2Z" fill="rgba(0,212,255,0.2)"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">AEROSCOUT-1</h1>
+        <div class="brand-subtitle">ORBITAL LAUNCH PAD 01 &bull; TEST CIRCUIT</div>
+      </div>
+    </div>
+
+    <!-- Quick Audio & Help Buttons -->
+    <div class="header-actions">
+      <button id="btn-sound" class="btn-icon" aria-label="Toggle Sound Effects" title="Toggle Sound FX">
+        <span class="icon-sound">🔊</span>
+        <span class="btn-label-text">AUDIO</span>
+      </button>
+      <button id="btn-info" class="btn-icon" aria-label="Toggle Flight Guide" title="Flight Guide">
+        <span>ℹ️</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Flight Telemetry Overlay (Top-Left / Mobile Adaptable) -->
+  <div class="hud-telemetry" id="telemetry-panel">
+    <div class="telemetry-header">
+      <span class="indicator-dot pulse"></span>
+      <span class="telemetry-status" id="hud-status">READY ON PAD</span>
+    </div>
+
+    <div class="telemetry-grid">
+      <div class="telemetry-cell">
+        <span class="telemetry-label">ALTITUDE</span>
+        <span class="telemetry-value" id="hud-alt">0.0 <span class="unit">m</span></span>
+      </div>
+      <div class="telemetry-cell">
+        <span class="telemetry-label">AIRSPEED</span>
+        <span class="telemetry-value" id="hud-speed">0 <span class="unit">km/h</span></span>
+      </div>
+      <div class="telemetry-cell">
+        <span class="telemetry-label">THROTTLE</span>
+        <span class="telemetry-value" id="hud-throttle">0<span class="unit">%</span></span>
+      </div>
+      <div class="telemetry-cell">
+        <span class="telemetry-label">GEAR</span>
+        <span class="telemetry-value" id="hud-gear">DOWN</span>
+      </div>
+    </div>
+
+    <!-- Flight Circuit Progress Bar -->
+    <div class="progress-wrap" id="progress-container">
+      <div class="progress-bar-labels">
+        <span>CIRCUIT PROGRESS</span>
+        <span id="hud-progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="hud-progress-fill"></div>
+      </div>
+      <div class="waypoint-markers">
+        <span class="wp-dot" title="Liftoff">PAD</span>
+        <span class="wp-dot" title="Climb">WP1</span>
+        <span class="wp-dot" title="Turn">WP2</span>
+        <span class="wp-dot" title="Ridge">WP3</span>
+        <span class="wp-dot" title="Downwind">WP4</span>
+        <span class="wp-dot" title="Approach">WP5</span>
+        <span class="wp-dot" title="Touchdown">LAND</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Controls Floating Palette (Right Side) -->
+  <aside class="hud-camera-tools" aria-label="Camera Controls">
+    <div class="cam-modes-card">
+      <span class="tools-title">CAMERA VIEW</span>
+      <div class="cam-button-group">
+        <button class="cam-btn active" data-mode="FOLLOW" id="cam-follow">
+          <span class="cam-icon">🎥</span> Follow
+        </button>
+        <button class="cam-btn" data-mode="PAD" id="cam-pad">
+          <span class="cam-icon">🗼</span> Pad Cam
+        </button>
+        <button class="cam-btn" data-mode="FREE" id="cam-free">
+          <span class="cam-icon">🔄</span> Free Orbit
+        </button>
+        <button class="cam-btn" data-mode="COCKPIT" id="cam-cockpit">
+          <span class="cam-icon">🧑‍🚀</span> Cockpit
+        </button>
+      </div>
+
+      <div class="cam-helpers">
+        <button class="btn-tool" id="btn-zoom-in" title="Zoom In (+)" aria-label="Zoom In">🔍+</button>
+        <button class="btn-tool" id="btn-zoom-out" title="Zoom Out (-)" aria-label="Zoom Out">🔍-</button>
+        <button class="btn-tool" id="btn-reset-cam" title="Reset View (R)" aria-label="Reset Camera View">⟲ Reset</button>
+      </div>
+    </div>
+
+    <div class="gesture-hint">
+      <span>🖱️ Drag to Orbit &bull; Scroll to Zoom</span>
+    </div>
+  </aside>
+
+  <!-- Bottom Primary Flight Command Deck -->
+  <footer class="hud-footer">
+    <div class="flight-controls-card">
+      <!-- Main Action: Launch / Takeoff -->
+      <button id="btn-takeoff" class="btn-primary" aria-label="Initiate Takeoff and Fly Circuit">
+        <span class="btn-glow"></span>
+        <span class="btn-icon-large">🚀</span>
+        <span class="btn-content">
+          <span class="btn-headline">INITIATE TAKEOFF</span>
+          <span class="btn-subtext">Fly local circuit & return to pad</span>
+        </span>
+      </button>
+
+      <!-- In-Flight Action Controls -->
+      <div class="in-flight-actions">
+        <!-- Land Now / Immediate Return -->
+        <button id="btn-land" class="btn-secondary" disabled aria-label="Land Now on Pad">
+          <span>🛬</span>
+          <span>Land Now</span>
+        </button>
+
+        <!-- Pause / Resume -->
+        <button id="btn-pause" class="btn-secondary" disabled aria-label="Pause or Resume Flight">
+          <span id="pause-icon">⏸️</span>
+          <span id="pause-label">Pause</span>
+        </button>
+
+        <!-- Speed Selector (0.5x / 1x / 2x) -->
+        <div class="speed-toggle-wrap">
+          <span class="speed-label">SPEED:</span>
+          <div class="speed-pill-group">
+            <button class="btn-pill" data-speed="0.5">0.5×</button>
+            <button class="btn-pill active" data-speed="1.0">1×</button>
+            <button class="btn-pill" data-speed="2.0">2×</button>
+          </div>
+        </div>
+
+        <!-- Reset to Pad -->
+        <button id="btn-reset-ship" class="btn-secondary danger" aria-label="Reset Ship to Pad">
+          <span>🔄</span>
+          <span>Reset Pad</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Help / Info Modal Dialog -->
+  <div class="modal-overlay hidden" id="info-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Flight Test Operations Guide</h2>
+        <button class="btn-close" id="btn-close-modal" aria-label="Close Guide">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Welcome to <strong>AeroScout-1 Flight Deck</strong>. The spacecraft is fully prepped on Launch Pad 01.</p>
+
+        <h3>Flight Phases:</h3>
+        <ul>
+          <li><strong>Vertical Liftoff:</strong> VTOL thrusters spool up, ship ascends vertically to 16m hover altitude while retracting landing gear.</li>
+          <li><strong>Local Test Circuit:</strong> Ship banks dynamically along the valley and canyon ridge waypoints, demonstrating coordinated turns and engine throttle.</li>
+          <li><strong>Approach & Landing:</strong> Ship aligns back above the pad, deploys landing gear, descends gently, and touches down smoothly.</li>
+        </ul>
+
+        <h3>Interactive Controls:</h3>
+        <ul>
+          <li><strong>Camera:</strong> Left-click / drag to Orbit, Right-click to Pan, Scroll / Pinch to Zoom. Switch between <em>Follow</em>, <em>Pad Cam</em>, <em>Free Orbit</em>, and <em>Cockpit</em>.</li>
+          <li><strong>Shortcuts:</strong> <code>Space</code> Takeoff / Pause, <code>R</code> Reset Camera, <code>L</code> Land Now, <code>1 / 2 / 3</code> Camera Views, <code>M</code> Toggle Sound.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary-small" id="btn-modal-gotit">Got It & Let's Fly</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

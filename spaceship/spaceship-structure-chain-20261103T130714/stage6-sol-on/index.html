@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Interactive 3D skyport: watch a spaceship lap the landing pad and depart into the distance.">
+  <title>Skyport Pad 1 · Spaceship Departure</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%B8%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="scene" aria-label="3D view of a spaceship above a landing pad"></canvas>
+
+  <header class="hud">
+    <div class="title">
+      <h1>Skyport Pad 1</h1>
+      <p id="status" aria-live="polite">Ship hovering over the landing pad.</p>
+    </div>
+    <label class="destination" for="destination">
+      <span>Destination</span>
+      <select id="destination" aria-describedby="destination-help"></select>
+      <small id="destination-help">Choose a world before launch.</small>
+    </label>
+    <ol class="phases" aria-label="Flight phase">
+      <li data-phase="hover">Hover</li>
+      <li data-phase="lap">Lap</li>
+      <li data-phase="depart">Depart</li>
+      <li data-phase="gone">Arrived</li>
+    </ol>
+  </header>
+
+  <nav class="controls" aria-label="Scene controls">
+    <button id="launch" class="btn primary" type="button" title="Shortcut: L">Launch</button>
+    <button id="replay" class="btn primary" type="button" hidden>Replay</button>
+    <button id="pause" class="btn" type="button" hidden>Pause</button>
+    <button id="reset" class="btn" type="button" title="Shortcut: R">Reset camera</button>
+    <div class="zoom" role="group" aria-label="Zoom">
+      <button id="zoomIn" class="btn icon" type="button" aria-label="Zoom in" title="Shortcut: +">+</button>
+      <button id="zoomOut" class="btn icon" type="button" aria-label="Zoom out" title="Shortcut: -">&minus;</button>
+    </div>
+  </nav>
+
+  <p class="hint">
+    <span class="hint-mouse">Drag to orbit · Scroll to zoom · Right-drag to pan</span>
+    <span class="hint-touch">Drag to orbit · Pinch to zoom · Two fingers to pan</span>
+  </p>
+
+  <div id="loading" class="loading" role="status">Loading skyport…</div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

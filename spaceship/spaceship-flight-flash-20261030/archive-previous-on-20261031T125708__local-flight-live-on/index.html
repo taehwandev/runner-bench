@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Aero-X Local Flight Test | 3D Interactive Spaceship</title>
+  <link rel="stylesheet" href="./src/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <!-- HUD Interface Layer -->
+  <div id="hud-overlay" class="hud-overlay">
+    <!-- Top Navigation & Telemetry Bar -->
+    <header class="hud-header">
+      <div class="hud-brand">
+        <div class="ship-icon-badge">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L4 18l8-3 8 3-8-16z"/>
+            <path d="M12 15v7"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="mission-title">APEX-VII PROTOTYPE</span>
+          <span class="mission-sub">PAD-01 LOCAL TEST CIRCUIT</span>
+        </div>
+      </div>
+
+      <!-- Telemetry Strip -->
+      <div class="hud-telemetry" id="telemetry-bar">
+        <div class="telem-item">
+          <span class="telem-label">STATE</span>
+          <span class="telem-value status-badge" id="telem-status">PAD READY</span>
+        </div>
+        <div class="telem-divider"></div>
+        <div class="telem-item">
+          <span class="telem-label">ALTITUDE</span>
+          <span class="telem-value" id="telem-alt">0.0 <small>m</small></span>
+        </div>
+        <div class="telem-divider"></div>
+        <div class="telem-item">
+          <span class="telem-label">AIRSPEED</span>
+          <span class="telem-value" id="telem-speed">0 <small>km/h</small></span>
+        </div>
+        <div class="telem-divider"></div>
+        <div class="telem-item">
+          <span class="telem-label">THRUST</span>
+          <div class="thrust-meter-wrapper">
+            <div class="thrust-bar" id="telem-thrust-bar" style="width: 12%"></div>
+            <span class="telem-value" id="telem-thrust">12%</span>
+          </div>
+        </div>
+        <div class="telem-divider"></div>
+        <div class="telem-item">
+          <span class="telem-label">CIRCUIT WP</span>
+          <span class="telem-value" id="telem-waypoint">0 / 6</span>
+        </div>
+      </div>
+
+      <!-- Header Quick Tools -->
+      <div class="hud-actions-right">
+        <button id="btn-sound-toggle" class="hud-icon-btn" title="Toggle Engine Audio (M)" aria-label="Toggle Engine Audio">
+          <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <svg id="icon-sound-off" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+        <button id="btn-path-toggle" class="hud-icon-btn active" title="Toggle Flight Path Ribbon (P)" aria-label="Toggle Flight Path Ribbon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 17l6-6 4 4 8-8"/>
+            <circle cx="21" cy="7" r="2"/>
+            <circle cx="3" cy="17" r="2"/>
+          </svg>
+        </button>
+        <button id="btn-info-toggle" class="hud-icon-btn" title="Mission Info & Controls Guide (H)" aria-label="Controls Guide">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Flight Circuit Progress Tracker (Shows live flight stage along the loop) -->
+    <div class="circuit-progress-container" id="circuit-progress-bar">
+      <div class="progress-track">
+        <div class="progress-fill" id="flight-progress-fill" style="width: 0%"></div>
+      </div>
+      <div class="progress-labels">
+        <span class="stage-tag active" data-stage="pad">Pad</span>
+        <span class="stage-tag" data-stage="takeoff">Liftoff</span>
+        <span class="stage-tag" data-stage="climb">North Climb</span>
+        <span class="stage-tag" data-stage="canyon">Canyon Turn</span>
+        <span class="stage-tag" data-stage="coastal">Coast Cruise</span>
+        <span class="stage-tag" data-stage="approach">Base Approach</span>
+        <span class="stage-tag" data-stage="land">Pad Landing</span>
+      </div>
+    </div>
+
+    <!-- Floating Target Marker / Lock-on Box in Screen Space -->
+    <div id="ship-screen-tracker" class="ship-screen-tracker">
+      <div class="tracker-corner tl"></div>
+      <div class="tracker-corner tr"></div>
+      <div class="tracker-corner bl"></div>
+      <div class="tracker-corner br"></div>
+      <span class="tracker-tag" id="tracker-tag-text">APEX-VII [PAD]</span>
+    </div>
+
+    <!-- Camera Control Panel (Floating Right) -->
+    <aside class="camera-toolbar" aria-label="Camera Controls">
+      <div class="cam-modes-label">CAMERA VIEW</div>
+      <div class="cam-mode-buttons">
+        <button id="cam-orbit" class="cam-btn active" data-cam="orbit" title="Orbit Camera: Pan, rotate and zoom freely">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/>
+            <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(30 12 12)"/>
+          </svg>
+          <span>Free Orbit</span>
+        </button>
+        <button id="cam-chase" class="cam-btn" data-cam="chase" title="Chase Camera: Follow close behind spaceship">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l4 8-4-2-4 2 4-8z"/>
+            <path d="M12 10v12"/>
+          </svg>
+          <span>Chase Cam</span>
+        </button>
+        <button id="cam-pad" class="cam-btn" data-cam="pad" title="Pad Tower: Ground observation perspective">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="7" y="10" width="10" height="12" rx="1"/>
+            <path d="M12 2v8"/>
+            <circle cx="12" cy="5" r="3"/>
+          </svg>
+          <span>Pad Tower</span>
+        </button>
+        <button id="cam-cockpit" class="cam-btn" data-cam="cockpit" title="Cockpit Cam: Pilot POV">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 15s3-5 8-5 8 5 8 5"/>
+            <line x1="12" y1="10" x2="12" y2="17"/>
+          </svg>
+          <span>Cockpit</span>
+        </button>
+      </div>
+
+      <div class="cam-zoom-row">
+        <button id="cam-zoom-in" class="cam-small-btn" title="Zoom In (+)" aria-label="Zoom In">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="11" y1="8" x2="11" y2="14"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </button>
+        <button id="cam-zoom-out" class="cam-small-btn" title="Zoom Out (-)" aria-label="Zoom Out">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </button>
+        <button id="cam-reset" class="cam-small-btn reset-btn" title="Reset View (R)" aria-label="Reset View">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          <span>Reset</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Bottom Flight Control Bar -->
+    <footer class="hud-footer">
+      <div class="flight-controls-card">
+        <!-- Main Primary Action Launch Button -->
+        <button id="btn-launch-circuit" class="primary-launch-btn">
+          <div class="btn-glow-ring"></div>
+          <div class="btn-content">
+            <span class="btn-icon">🚀</span>
+            <div class="btn-text-group">
+              <span class="btn-primary-title" id="launch-btn-title">INITIATE TAKEOFF</span>
+              <span class="btn-subtitle" id="launch-btn-sub">Fly local test circuit & return to pad</span>
+            </div>
+          </div>
+        </button>
+
+        <!-- Secondary Flight Control Action Buttons -->
+        <div class="aux-controls-group">
+          <!-- Return & Land Now Button -->
+          <button id="btn-land-now" class="aux-btn" disabled title="Recall ship and execute smooth pad landing (L)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v14"/>
+              <path d="M7 11l5 5 5-5"/>
+              <line x1="4" y1="20" x2="20" y2="20"/>
+            </svg>
+            <span>Land on Pad</span>
+          </button>
+
+          <!-- Hover / Hold Position Button -->
+          <button id="btn-pause-flight" class="aux-btn" disabled title="Station-keep / Hover in place (Space)">
+            <svg id="icon-pause" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="6" y="4" width="4" height="16"/>
+              <rect x="14" y="4" width="4" height="16"/>
+            </svg>
+            <svg id="icon-resume" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span id="label-pause-btn">Hover / Hold</span>
+          </button>
+
+          <!-- Flight Speed Multiplier Selector -->
+          <div class="speed-selector-group">
+            <span class="speed-label">SPEED:</span>
+            <div class="speed-pills">
+              <button class="speed-pill" data-speed="0.5" title="Cinematic Slow-Mo">0.5x</button>
+              <button class="speed-pill active" data-speed="1.0" title="Normal Test Speed">1.0x</button>
+              <button class="speed-pill" data-speed="1.75" title="High Speed Circuit">1.75x</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Guidance Prompt Strip -->
+      <div class="flight-hint-bar">
+        <span class="hint-key">🖱️ Left Drag / Touch Drag:</span> Orbit Cam
+        <span class="hint-separator">•</span>
+        <span class="hint-key">Wheel / Pinch:</span> Zoom
+        <span class="hint-separator">•</span>
+        <span class="hint-key">Right Drag:</span> Pan
+        <span class="hint-separator">•</span>
+        <span class="hint-key">[Space]:</span> Launch / Hold
+        <span class="hint-separator">•</span>
+        <span class="hint-key">[R]:</span> Reset Cam
+      </div>
+    </footer>
+
+    <!-- Info / Help Dialog Modal -->
+    <div id="modal-info" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <span class="modal-icon">🛸</span>
+            <h2 id="modal-title">APEX-VII Flight Test Facility</h2>
+          </div>
+          <button id="btn-modal-close" class="modal-close-btn" aria-label="Close dialog">✕</button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Welcome to the <strong>Pad-01 Local Flight Test</strong> console. The APEX-VII light research spaceship is pre-flight ready on the elevated landing pad.
+          </p>
+          <div class="modal-section">
+            <h3>Test Circuit Features</h3>
+            <ul>
+              <li><strong>Vertical Liftoff:</strong> Dual ion thrusters spool up with heat plume & dynamic illumination, climbing vertically to 16m.</li>
+              <li><strong>Local Navigation Circuit:</strong> The ship pitches and banks through 5 scenic waypoints past the North Tower, Canyon Ridge, and Coastal Station.</li>
+              <li><strong>Waypoint Guidance Towers:</strong> Glowing navigational beacons in the terrain mark the designated circuit trajectory.</li>
+              <li><strong>Precision Landing:</strong> Upon completing the loop, the ship automatically flares, decelerates, enters hover descent, and touches down smoothly on the central landing pad.</li>
+            </ul>
+          </div>
+          <div class="modal-section">
+            <h3>Camera System</h3>
+            <ul>
+              <li><strong>Free Orbit:</strong> Rotate from any angle, zoom close to inspect the ship or pad, pan across the spaceport.</li>
+              <li><strong>Chase Cam:</strong> Dynamic trailing camera locked to the spaceship's motion and banking turns.</li>
+              <li><strong>Pad Tower:</strong> Static tower observation camera tracking the spaceship across the sky.</li>
+              <li><strong>Cockpit:</strong> Pilot vantage point viewing forward over the flight horizon.</li>
+            </ul>
+          </div>
+          <div class="modal-section">
+            <h3>Shortcuts</h3>
+            <p><code>Space</code>: Takeoff / Hover &bull; <code>L</code>: Return to Pad &bull; <code>R</code>: Reset View &bull; <code>C</code>: Cycle Camera &bull; <code>P</code>: Toggle Path Ribbon &bull; <code>M</code>: Toggle Audio</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-modal-got-it" class="modal-action-btn">Got It, Ready to Fly!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

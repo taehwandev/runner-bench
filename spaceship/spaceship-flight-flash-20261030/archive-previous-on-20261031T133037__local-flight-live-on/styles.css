@@ -1,0 +1,589 @@
+:root {
+  --primary-cyan: #06b6d4;
+  --primary-glow: rgba(6, 182, 212, 0.4);
+  --accent-orange: #f97316;
+  --accent-green: #10b981;
+  --accent-amber: #f59e0b;
+  --bg-hud: rgba(15, 23, 42, 0.75);
+  --bg-hud-solid: #0f172a;
+  --border-hud: rgba(56, 189, 248, 0.25);
+  --border-hud-active: rgba(56, 189, 248, 0.8);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', Courier, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0b1120;
+  font-family: var(--font-sans);
+  color: var(--text-main);
+}
+
+#canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Glassmorphism Sci-Fi UI Overlay */
+#ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none; /* Let 3D canvas receive pointer events unless clicking UI buttons */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+/* Common interactive glass container */
+.hud-panel {
+  background: var(--bg-hud);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-hud);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+
+/* Top Navigation Bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--primary-cyan);
+}
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Status Badge */
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+  animation: pulse-dot 1.8s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid var(--border-hud);
+  color: var(--text-main);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--border-hud-active);
+  color: var(--primary-cyan);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* Middle Layout: Camera Controls on Left, Telemetry on Right */
+.middle-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: 1;
+  pointer-events: none;
+  margin: 12px 0;
+  position: relative;
+}
+
+/* Camera Control Toolbar */
+.camera-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  pointer-events: auto;
+}
+
+.camera-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  padding: 0 4px;
+}
+
+.camera-modes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.cam-mode-btn {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border-hud);
+  color: var(--text-muted);
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.cam-mode-btn.active {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: var(--primary-cyan);
+  color: var(--text-main);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+}
+
+.camera-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cam-action-btn {
+  flex: 1;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border-hud);
+  color: var(--text-main);
+  padding: 7px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 36px;
+  transition: all 0.2s ease;
+}
+
+.cam-action-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--primary-cyan);
+}
+
+.cam-action-btn:active {
+  transform: scale(0.96);
+}
+
+/* Telemetry HUD (Right) */
+.telemetry-card {
+  width: 210px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.telemetry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  padding-bottom: 6px;
+}
+
+.telemetry-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary-cyan);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.telemetry-time {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.metric-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.metric-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.metric-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.metric-number {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+}
+
+.metric-unit {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Metric Bars */
+.metric-bar-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(30, 41, 59, 0.9);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.metric-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--primary-cyan);
+  border-radius: 9999px;
+  transition: width 0.15s ease-out, background-color 0.3s ease;
+}
+
+/* Waypoint Progress Indicator */
+.circuit-tracker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.circuit-label {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.circuit-pct {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--primary-cyan);
+}
+
+/* Bottom Flight Control Deck */
+.bottom-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.control-deck {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  pointer-events: auto;
+}
+
+/* Primary Launch / Return Button */
+.primary-launch-btn {
+  flex: 1.5;
+  background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 48px;
+}
+
+.primary-launch-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(6, 182, 212, 0.6);
+  background: linear-gradient(135deg, #0369a1 0%, #0891b2 100%);
+}
+
+.primary-launch-btn:active {
+  transform: translateY(1px);
+}
+
+.primary-launch-btn.returning {
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4);
+}
+
+.primary-launch-btn.returning:hover {
+  background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%);
+  box-shadow: 0 6px 24px rgba(249, 115, 22, 0.6);
+}
+
+.deck-secondary-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-btn {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid var(--border-hud);
+  color: var(--text-main);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  min-height: 48px;
+  transition: all 0.2s ease;
+}
+
+.deck-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--primary-cyan);
+}
+
+.deck-btn:active {
+  transform: scale(0.96);
+}
+
+.deck-btn.active {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: var(--primary-cyan);
+  color: var(--primary-cyan);
+}
+
+/* User interaction gesture hint */
+.gesture-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  background: rgba(15, 23, 42, 0.6);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* SVG icons */
+.svg-icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 860px) {
+  #ui-overlay {
+    padding: 10px;
+  }
+
+  .top-bar {
+    padding: 8px 12px;
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .middle-area {
+    margin: 6px 0;
+  }
+
+  .telemetry-card {
+    width: 165px;
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .metric-number {
+    font-size: 16px;
+  }
+
+  .camera-toolbar {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .camera-modes {
+    grid-template-columns: 1fr;
+  }
+
+  .cam-mode-btn {
+    padding: 6px 8px;
+    font-size: 10px;
+    min-height: 32px;
+  }
+
+  .control-deck {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .primary-launch-btn {
+    font-size: 12px;
+    padding: 10px 14px;
+    min-height: 44px;
+  }
+
+  .deck-btn {
+    padding: 8px 10px;
+    font-size: 11px;
+    min-height: 44px;
+  }
+
+  .gesture-hint {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .telemetry-card {
+    width: 135px;
+    padding: 8px;
+  }
+
+  .metric-label-row {
+    font-size: 9px;
+  }
+
+  .metric-number {
+    font-size: 14px;
+  }
+
+  .deck-secondary-controls .btn-label {
+    display: none;
+  }
+
+  .deck-btn {
+    padding: 8px;
+    width: 44px;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Launch Pad 07 · Vela-9 Shuttle</title>
+<link rel="icon" href="data:," />
+<link rel="stylesheet" href="styles.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<canvas id="scene" role="img" aria-label="3D view of the Vela-9 shuttle hovering above a landing pad in daylight"></canvas>
+
+<p id="fallback" class="fallback" hidden>This scene needs WebGL. Try a current browser with hardware acceleration enabled.</p>
+
+<header class="hud">
+  <h1>Launch Pad 07 · Vela-9</h1>
+  <p class="sub">Shuttle on hover, awaiting departure.</p>
+  <span class="phase" id="phase" data-phase="hover" aria-live="polite">Hovering</span>
+  <dl class="telemetry">
+    <div><dt>Altitude</dt><dd id="alt">0.0 m</dd></div>
+    <div><dt>Speed</dt><dd id="spd">0.0 m/s</dd></div>
+    <div><dt>Range</dt><dd id="rng">0 m</dd></div>
+  </dl>
+  <p class="hint">Drag to orbit · Scroll or pinch to zoom<span class="kbd"><br>Keys: L launch · F follow · R reset · +/− zoom</span></p>
+</header>
+
+<nav class="dock" aria-label="Scene controls">
+  <button id="launch" class="primary">Launch</button>
+  <div class="group">
+    <button id="follow" aria-pressed="false" title="Keep the ship centred as it moves (F)">Follow</button>
+    <button id="reset" title="Return to the pad view (R)">Reset view</button>
+    <button id="zoomOut" class="icon-btn" aria-label="Zoom out" title="Zoom out (−)">−</button>
+    <button id="zoomIn" class="icon-btn" aria-label="Zoom in" title="Zoom in (+)">+</button>
+  </div>
+</nav>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

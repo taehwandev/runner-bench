@@ -1,0 +1,173 @@
+  :root {
+    --ink: #0f2236;
+    --ink-soft: #46607a;
+    --panel: rgba(255, 255, 255, 0.84);
+    --line: rgba(15, 34, 54, 0.14);
+    --accent: #ff7a3d;
+    --accent-deep: #e2561b;
+    --focus: #1f7ae0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #cfe9ff;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #stage {
+    position: fixed;
+    inset: 0;
+  }
+
+  #stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    outline: none;
+  }
+
+  /* Title and live status: pointer-events off so the scene underneath still gets input. */
+  .hud {
+    position: fixed;
+    top: max(14px, env(safe-area-inset-top));
+    left: max(14px, env(safe-area-inset-left));
+    max-width: min(340px, calc(100vw - 28px));
+    padding: 10px 14px 11px;
+    border-radius: 14px;
+    background: var(--panel);
+    box-shadow: 0 6px 20px rgba(15, 34, 54, 0.12);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .hud h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .hud #status {
+    margin: 3px 0 0;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--ink-soft);
+  }
+
+  .hint {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+
+  /* Control dock: the bar itself lets touches pass through to the canvas, only buttons catch them. */
+  .dock {
+    position: fixed;
+    left: 50%;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: min(680px, calc(100vw - 24px));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 18px;
+    background: var(--panel);
+    box-shadow: 0 10px 30px rgba(15, 34, 54, 0.18);
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .dock > * { pointer-events: auto; }
+
+  .btn {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease, opacity 0.15s ease;
+  }
+
+  .btn:hover { background: #f1f6fc; }
+  .btn:active { transform: scale(0.97); }
+  .btn[aria-pressed="true"] { background: #dcebfd; border-color: var(--focus); }
+
+  .btn:focus-visible,
+  .icon-btn:focus-visible {
+    outline: 3px solid rgba(31, 122, 224, 0.55);
+    outline-offset: 2px;
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+  }
+
+  .btn-primary {
+    min-width: 170px;
+    background: var(--accent);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(226, 86, 27, 0.35);
+  }
+
+  .btn-primary:hover:not(:disabled) { background: var(--accent-deep); }
+  .btn-primary:disabled { background: #b9c3cf; box-shadow: none; color: #ffffff; opacity: 1; }
+
+  .zoom {
+    display: inline-flex;
+    gap: 6px;
+  }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .icon-btn:hover { background: #f1f6fc; }
+  .icon-btn:active { transform: scale(0.96); }
+
+  .noscript-msg {
+    position: fixed;
+    inset: auto 16px 90px;
+    text-align: center;
+    color: var(--ink);
+  }
+
+  @media (max-width: 600px) {
+    .hint { display: none; }
+    .dock { gap: 6px; padding: 8px; }
+    .btn-primary { flex: 1 1 100%; min-height: 48px; order: -1; }
+    .btn { flex: 1 1 0; padding: 0 10px; min-height: 46px; }
+    .icon-btn { width: 46px; height: 46px; }
+    .zoom { flex: 0 0 auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .icon-btn { transition: none; }
+  }

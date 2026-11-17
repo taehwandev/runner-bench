@@ -1,0 +1,189 @@
+:root {
+  --panel-bg: rgba(15, 28, 48, 0.62);
+  --panel-border: rgba(255, 255, 255, 0.22);
+  --text: #f4f8ff;
+  --muted: #c9d8ee;
+  --accent: #ff8a3d;
+  --accent-hover: #ffa15e;
+  --focus: #9fe1ff;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #cfe8ff;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+.panel {
+  position: fixed;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  box-shadow: 0 10px 30px rgba(10, 25, 50, 0.25);
+}
+
+/* ---------- Title and status ---------- */
+.hud {
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  width: min(320px, calc(100vw - 32px));
+  padding: 14px 16px 16px;
+}
+
+.hud h1 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.hud #status {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+  min-height: 1.3em;
+}
+
+.progress {
+  margin-top: 12px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #7fd8ff, var(--accent));
+  border-radius: inherit;
+}
+
+/* ---------- Buttons ---------- */
+.controls {
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+}
+
+.controls button {
+  appearance: none;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.15s ease, transform 0.08s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.controls button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.24); }
+.controls button:active:not(:disabled) { transform: scale(0.97); }
+
+.controls button.primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: #1b1020;
+  min-width: 120px;
+}
+
+.controls button.primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.controls button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.controls button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Hint line ---------- */
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 66px);
+  transform: translateX(-50%);
+  margin: 0;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+  font-size: 0.82rem;
+  color: #1d3354;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+kbd {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(20, 40, 70, 0.25);
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 640px) {
+  .hud {
+    width: auto;
+    right: 16px;
+    padding: 10px 12px 12px;
+  }
+
+  .hud h1 { font-size: 1rem; }
+  .hud #status { font-size: 0.85rem; }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: calc(100vw - 24px);
+    max-width: 360px;
+  }
+
+  .controls button.primary { grid-column: 1 / -1; min-height: 52px; font-size: 1.05rem; }
+  .controls button { min-height: 48px; }
+
+  .hint {
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 150px);
+    font-size: 0.78rem;
+    width: calc(100vw - 32px);
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .controls button { transition: none; }
+}

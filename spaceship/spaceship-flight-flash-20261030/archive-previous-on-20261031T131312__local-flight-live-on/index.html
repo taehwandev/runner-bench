@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AeroFlight 3D — Spaceship Pad & Circuit Flight</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <main class="ui-layer">
+    <!-- Top Mission & Telemetry Header -->
+    <header class="top-bar">
+      <section class="mission-panel" aria-label="Mission Information">
+        <div class="mission-title-row">
+          <span class="ship-icon" aria-hidden="true">▲</span>
+          <h1 class="mission-title">AERO-01 // SC-01 STRIKEBIRD</h1>
+          <div id="status-badge" class="status-badge" role="status" aria-live="polite">
+            <span class="status-dot"></span>
+            <span id="status-text">PAD READY</span>
+          </div>
+        </div>
+        <p class="mission-desc">Daytime local test circuit over facility terrain with automated recovery to Pad-07.</p>
+      </section>
+
+      <section class="telemetry-panel" aria-label="Flight Telemetry">
+        <div class="telemetry-item">
+          <span class="telemetry-label">Altitude</span>
+          <span id="telemetry-alt" class="telemetry-value">0.0 m</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-label">Speed</span>
+          <span id="telemetry-spd" class="telemetry-value">0 km/h</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-label">Throttle</span>
+          <span id="telemetry-thr" class="telemetry-value">0%</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-label">Pad Dist</span>
+          <span id="telemetry-dist" class="telemetry-value">0.0 m</span>
+        </div>
+      </section>
+    </header>
+
+    <!-- Side Camera Controls Panel -->
+    <aside class="camera-controls-panel" aria-label="Camera Controls">
+      <div class="cam-btn-group">
+        <button id="cam-orbit" class="cam-btn active" title="Free Orbit View" aria-pressed="true">
+          <span>🔄 Orbit</span>
+        </button>
+        <button id="cam-chase" class="cam-btn" title="Chase Camera" aria-pressed="false">
+          <span>🚀 Chase</span>
+        </button>
+        <button id="cam-tower" class="cam-btn" title="Tower Pad Camera" aria-pressed="false">
+          <span>🗼 Tower</span>
+        </button>
+      </div>
+      <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 2px 0;">
+      <div class="cam-btn-group">
+        <button id="btn-zoom-in" class="cam-btn" title="Zoom In" aria-label="Zoom in">
+          <span>➕ In</span>
+        </button>
+        <button id="btn-zoom-out" class="cam-btn" title="Zoom Out" aria-label="Zoom out">
+          <span>➖ Out</span>
+        </button>
+        <button id="btn-reset-cam" class="cam-btn" title="Reset View" aria-label="Reset Camera View">
+          <span>🎯 Reset</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Bottom Flight Dock -->
+    <footer class="bottom-dock">
+      <div class="flight-action-bar">
+        <button id="btn-main-action" class="primary-btn" aria-label="Initiate Takeoff">
+          <span id="main-action-icon">🚀</span>
+          <span id="main-action-text">Initiate Takeoff</span>
+        </button>
+
+        <button id="btn-pause" class="secondary-btn" aria-label="Pause Flight Circuit">
+          <span id="pause-icon">⏸️</span>
+          <span id="pause-text">Hold</span>
+        </button>
+
+        <div class="speed-control" role="group" aria-label="Flight Speed">
+          <span class="speed-label">Speed:</span>
+          <button class="speed-btn" data-speed="0.5" aria-label="0.5 times speed">0.5x</button>
+          <button class="speed-btn active" data-speed="1.0" aria-label="Normal 1 times speed">1x</button>
+          <button class="speed-btn" data-speed="2.0" aria-label="2 times speed">2x</button>
+        </div>
+
+        <button id="btn-sound" class="secondary-btn" aria-label="Toggle Sound" title="Sound FX">
+          <span id="sound-icon">🔊</span>
+          <span id="sound-text">Sound</span>
+        </button>
+      </div>
+
+      <div class="touch-hint" aria-hidden="true">
+        🖱️ Drag mouse / 📱 Touch swipe to orbit • Scroll / pinch to zoom • Ship clearly visible at all times
+      </div>
+    </footer>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

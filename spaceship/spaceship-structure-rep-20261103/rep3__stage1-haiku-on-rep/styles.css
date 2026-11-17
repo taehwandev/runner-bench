@@ -1,0 +1,254 @@
+:root {
+  --ink: #0f1c2e;
+  --muted: #4b5b70;
+  --panel: rgba(255, 255, 255, 0.82);
+  --line: rgba(15, 28, 46, 0.12);
+  --accent: #ff6a2a;
+  --accent-soft: #ff8a50;
+  --focus: #1d6fd6;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: #cfe9ff;
+  -webkit-font-smoothing: antialiased;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+.fallback {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.fallback[hidden] { display: none; }
+
+/* ---------- Telemetry panel ---------- */
+.hud {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  width: min(300px, calc(100vw - 32px));
+  padding: 16px 18px;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(15, 28, 46, 0.14);
+  pointer-events: none;
+}
+
+.hud h1 {
+  margin: 0 0 2px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.hud .sub {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #e6f0ff;
+  color: var(--focus);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.phase::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.phase[data-phase="lap"] { background: #e6f7ee; color: #14865a; }
+.phase[data-phase="depart"] { background: #fff0e8; color: var(--accent); }
+.phase[data-phase="away"] { background: #efe9ff; color: #6a45c9; }
+
+.telemetry {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 12px;
+}
+
+.telemetry div {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(15, 28, 46, 0.05);
+}
+
+.telemetry dt {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.telemetry dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---------- Control dock ---------- */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  padding: 10px;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 12px 32px rgba(15, 28, 46, 0.16);
+  pointer-events: none;
+}
+
+.dock .group {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  user-select: none;
+}
+
+button:hover { background: #f1f6fc; }
+button:active { transform: scale(0.96); }
+
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.primary {
+  min-width: 156px;
+  border: none;
+  color: #fff;
+  font-size: 15px;
+  background: linear-gradient(180deg, var(--accent-soft), var(--accent));
+  box-shadow: 0 8px 20px rgba(255, 106, 42, 0.36);
+}
+
+.primary:hover { background: linear-gradient(180deg, #ff9962, #ff7434); }
+.primary:disabled { background: linear-gradient(180deg, #ffb08a, #ffa173); box-shadow: none; }
+
+.icon-btn {
+  width: 44px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 640px) {
+  .hud {
+    width: min(260px, calc(100vw - 24px));
+    padding: 12px 14px;
+  }
+
+  .hud h1 { font-size: 15px; }
+  .telemetry dd { font-size: 14px; }
+  .telemetry div { padding: 7px 8px; }
+
+  .dock {
+    flex-direction: column;
+    align-items: stretch;
+    width: calc(100vw - 24px);
+    gap: 8px;
+    padding: 8px;
+    border-radius: 18px;
+  }
+
+  .primary { width: 100%; min-height: 50px; }
+  .dock .group { width: 100%; }
+  .dock .group button { flex: 1 1 0; padding: 0 8px; }
+  .dock .group .icon-btn { flex: 0 0 52px; }
+}
+
+@media (pointer: coarse) {
+  .kbd { display: none; }
+}

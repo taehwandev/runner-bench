@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Interactive 3D scene: a spaceship hovers over a landing pad, makes one lap, then flies off into the distance.">
+  <meta name="theme-color" content="#cfe7fb">
+  <link rel="icon" href="data:,">
+  <title>Landing Pad 01 · Spaceship Departure</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="scene" aria-label="3D view of a spaceship hovering above a landing pad"></canvas>
+
+  <header class="card title-card">
+    <p class="eyebrow">Landing Pad 01</p>
+    <h1>Spaceship departure</h1>
+    <p class="status" id="status" aria-live="polite"></p>
+    <span class="badge" id="badge" data-phase="hover">Standby</span>
+  </header>
+
+  <section class="card panel" aria-label="Scene controls">
+    <button id="launch" class="btn btn-primary" type="button">Launch departure</button>
+    <div class="camera-row" role="group" aria-label="Camera controls">
+      <button id="zoomIn" class="btn icon" type="button" aria-label="Zoom in">+</button>
+      <button id="zoomOut" class="btn icon" type="button" aria-label="Zoom out">&minus;</button>
+      <button id="reset" class="btn" type="button">Reset camera</button>
+      <label class="toggle">
+        <input id="follow" type="checkbox">
+        <span class="track" aria-hidden="true"></span>
+        <span>Follow ship</span>
+      </label>
+    </div>
+    <p class="hint" id="hint"></p>
+  </section>
+
+  <div id="loading" class="loading"><span>Loading scene&hellip;</span></div>
+
+  <script>
+    // Shown if the Three.js CDN import never completes.
+    setTimeout(function () {
+      if (!window.__sceneReady) {
+        var el = document.querySelector('#loading span');
+        if (el) el.textContent = 'The 3D view could not load. Check your connection and reload.';
+      }
+    }, 12000);
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
