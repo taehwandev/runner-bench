@@ -1,0 +1,315 @@
+{
+  "phase": 1,
+  "status": "original",
+  "bundle": "/showcase/arena-34-arms.json",
+  "bundleSha256": "7a5540fbb06844e07d7e93abb53fe7e49c39d92caae887512d461904bac48683",
+  "evaluationScope": "Historical G1-G9 records, not a complete output-quality assessment or a specialist-3D-skill experiment.",
+  "artifacts": [
+    {
+      "trialId": "city_opus_raw_t3",
+      "model": "Claude Opus 5.5",
+      "moru": false,
+      "sourceSha256": "11762ddae8af1dd31dd53ddb34b481a61fac98c22cc2524d7fe39380fa3d44d7",
+      "compiledSha256": "73aaef7156c5e5f9ab9341b1f0cdeed1b86d72e946df9ce03dc6adf497c3c346",
+      "htmlSha256": "532422d6002f3d9e217ac4403f1e642cfb8480f25875e69eacda28a8a7afcc3e",
+      "historicalGateCount": 6
+    },
+    {
+      "trialId": "city_v2_opus_moru_t1",
+      "model": "Claude Opus 5.5",
+      "moru": true,
+      "sourceSha256": "e39ff132a60f89b0d921acd1a2b3b4bf14101a3e80f300aba09fb5b5ab390843",
+      "compiledSha256": "3c718c31336fbc9b4839b1d0e5d1833b5e0a147604797869bb8c0827bd20f8f3",
+      "htmlSha256": "3a31e2651ffcb74d3a3095126ab364d58447cd01236bf7b1e8dfa18b84fc5e84",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_sonnet55_raw_t1",
+      "model": "Claude Sonnet 5.5",
+      "moru": false,
+      "sourceSha256": "9bd3cccc07563e5fe7fec17588e88a07b941a4c3ecf250180663c3965881e490",
+      "compiledSha256": "d85d5fa96f023d84699d3f3b16a54217cfa7de7c4e1a663860763ce3a26b421c",
+      "htmlSha256": "7f4ab354e9f1b5ff0ff42e75eb7bc0a138ef214cb11f8e273ee7ae7ac13183f3",
+      "historicalGateCount": 4
+    },
+    {
+      "trialId": "city_v2_sonnet55_moru_t1",
+      "model": "Claude Sonnet 5.5",
+      "moru": true,
+      "sourceSha256": "3a085d446c2cb81fd9e5a9de149b0434fee0b58f7c6469f417b599376b41e8aa",
+      "compiledSha256": "7ef096f19d131362dc9124b47166c1bc239716113821ec5896f9f60f99f5c6c9",
+      "htmlSha256": "c840f69b32a5f57ed89a25d951ceb8743739c202e32cc9eb7f2caf356ba433c2",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_haiku_raw_t2",
+      "model": "Claude Haiku 5.5",
+      "moru": false,
+      "sourceSha256": "d535ac3f48d764e1ac9f3be17346f11be04f6787c589a3395a7cb8c23d8ecb5b",
+      "compiledSha256": "66e01b35b9a53566e6aa5a37c8ee8584b580e1a9d0b65a8e83ffd1d51c07041d",
+      "htmlSha256": "5d9a940637fd120de059d26072c95c406349df3f9b0f7b205c3a4eb5f6ee0c0f",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_haiku_moru_t2",
+      "model": "Claude Haiku 5.5",
+      "moru": true,
+      "sourceSha256": "c1bb9efa19f200d984d35ba6c8c4e92d96b6ca689d23e730b197e4ba77f39583",
+      "compiledSha256": "cccb68ce639c523ae58fddfaf6496b710ccfb7aa5c89177631a0462cabda95ad",
+      "htmlSha256": "5ea991883f96a3ebaa6ba664dda156f1b328a52b653413b3406857d859ab118d",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_opus50_raw_t1",
+      "model": "Claude Opus 5.0",
+      "moru": false,
+      "sourceSha256": "19c152c58c2d26fd619450d4773bbfe4090391baa7383708f0474a900139e6bb",
+      "compiledSha256": "497048eae68a471536b71b2d731987ab4dd794607b80a2e018ec88359f8690f8",
+      "htmlSha256": "f13f37ab26013842eae5ecc2c29711f9d83bd38d19e48d6f9681fbc0c844aaa8",
+      "historicalGateCount": 2
+    },
+    {
+      "trialId": "city_v2_opus50_moru_t1",
+      "model": "Claude Opus 5.0",
+      "moru": true,
+      "sourceSha256": "0cddd2b8e8eb45e150d3392ba80b3571f6cd1617687423f6e718e38e41d53f3f",
+      "compiledSha256": "a113bb47ea671a65fd1aecf49a5a4dfd9a1435ebd998bdf49ee09af4851fe498",
+      "htmlSha256": "a1db1302bc24296e1b99a8d2dc1847ac56babcb613273f4a40668e177009685d",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_sonnet50_raw_t1",
+      "model": "Claude Sonnet 5.0",
+      "moru": false,
+      "sourceSha256": "6c92e193be359b359c27d7b5e89cb72955657e8da43608bce1a5432b5a3b52d5",
+      "compiledSha256": "7c1968e0bba5b43f000ce6d6096d94260203cf5cf08e46b81568bd9ac15fb6ec",
+      "htmlSha256": "1af6cbd8873476fd9759fe56ede46c33b75d3ce6352793438bd557fc99252bac",
+      "historicalGateCount": 3
+    },
+    {
+      "trialId": "city_v2_sonnet50_moru_t1",
+      "model": "Claude Sonnet 5.0",
+      "moru": true,
+      "sourceSha256": "4b4fd69f8b3103afc013546002efdd956c7a5fae13d7ee87fb22ebb668add2b1",
+      "compiledSha256": "29197b14fa84b557249a7343da6d9f8a495bc358809b8b92b014d9767335cfe6",
+      "htmlSha256": "5eeefeb3d31ef602cb139311eceb803076405bb419a110c739319b60beef121f",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_opus46_raw_t1",
+      "model": "Claude Opus 4.6",
+      "moru": false,
+      "sourceSha256": "13dbf2a3b7a94c860ef29b5dfa8bbbfb89856d526c55ddfc5cd747a934453aee",
+      "compiledSha256": "2641840743889431f853b36b0103e6322549a2a8f00f89fb1938ce4e3b5962e6",
+      "htmlSha256": "9b8957455b4af54a38d1c3d345b1894e6bae9db1bc56308b88173dc4b016f368",
+      "historicalGateCount": 3
+    },
+    {
+      "trialId": "city_v2_opus46_moru_t1",
+      "model": "Claude Opus 4.6",
+      "moru": true,
+      "sourceSha256": "ef58cb877e54c67fc662ee494fbe6ecb82d5a4c9aa874be5db91ed6c178fb63d",
+      "compiledSha256": "2cd8de06db0d6e557ddc34a015999284fe9484f255e110542dad9f396ea5d8da",
+      "htmlSha256": "af70390b11eb95a4274e8dc8437506247db5b8f597837c528277b9f24e25868f",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_sonnet46_raw_t1",
+      "model": "Claude Sonnet 4.6",
+      "moru": false,
+      "sourceSha256": "667e45bf695817612205ee55932a9b6c87c318e08820fe39e81234e175d080dd",
+      "compiledSha256": "2c191a82b5ce4d1bc3475fc11e674d3dc271dd6b0e88383c93f73c605cbb3c99",
+      "htmlSha256": "99e2f8e125289c3364a3bbd58aaa32478e92a1ad23b076533b8eaaedcbee04af",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_sonnet46_moru_t1",
+      "model": "Claude Sonnet 4.6",
+      "moru": true,
+      "sourceSha256": "3cc0cd3dd37bea70a22a3ccdd625ce7f81b843e2d8a00d0d077c54e378ccdc29",
+      "compiledSha256": "33480abe248bd293ad4c405caaf0ff883c5838ccac16c7321b2f79fdeab0d980",
+      "htmlSha256": "20184be5bee29e24c67568f608c1e998a04eedc95b179992069bd5fcc273354d",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_haiku45_raw_t1",
+      "model": "Claude Haiku 4.5",
+      "moru": false,
+      "sourceSha256": "473cae1b18ea26b75935d2348b282c9eddb638055b1a5b31efd58675b3f6d673",
+      "compiledSha256": "9f4095fbad3db816a83174dce9e4648ca24bdf5e628720738d87e3173fbd3e0e",
+      "htmlSha256": "5bb67ef33c9e2494b462bb5b40cd61366747e4096c3a9e2ca87cd841df7bad3c",
+      "historicalGateCount": 2
+    },
+    {
+      "trialId": "city_v2_haiku45_moru_t1",
+      "model": "Claude Haiku 4.5",
+      "moru": true,
+      "sourceSha256": "6411bf1f61e60d03deee71c5c3402d44ef9d948bcb88b5e09ae98a9298fc24d0",
+      "compiledSha256": "4d433a1b37140ccec4d32d0397b5dd42ad891783cdefa8c051ae90fb488030fc",
+      "htmlSha256": "4db96ffb0561ed7ba73b6b0050ba01a7e87a2214007d0f65e0d8a5564e764011",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_astra_raw_t1",
+      "model": "Codex GPT-6-Astra",
+      "moru": false,
+      "sourceSha256": "d697b45701424ff731cd583c08abad63726af4222f61c935f2b75b8bc8e9028b",
+      "compiledSha256": "37a49e169849eda4cffbe4396eb85e838436509f83859b208accc298dd3f3910",
+      "htmlSha256": "0c5fa31963a5ad0dc1da075fbcf13510584ec5575abb1d90176aa5f4986225ca",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_astra_moru_t1",
+      "model": "Codex GPT-6-Astra",
+      "moru": true,
+      "sourceSha256": "ba315693af62926a08341ae0acc7380dbb62389c73fcecb8b5fcb25c30ca28c8",
+      "compiledSha256": "63e06bc8d3dec13912cb9a194324accc3d9bc34d387375ea8e0d902d67ad1a17",
+      "htmlSha256": "acc97b8612e774262db25d414325bf2bcc157d7c9f4235c9db986c2001f04e56",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_sol_raw_t1",
+      "model": "Codex GPT-6.1-Sol",
+      "moru": false,
+      "sourceSha256": "0e1de61642439813b1e08a602cb45e5ecd1d3609f31800c66d91182fd174b0ad",
+      "compiledSha256": "6e508c8756445d608348fec87cb4db5fdc8ebb39f3c2f9c004315442d04b825b",
+      "htmlSha256": "41f587d0e7463bbfcf230961ffcda4faaaf461fc72d81206389632072ba65ab4",
+      "historicalGateCount": 3
+    },
+    {
+      "trialId": "city_v2_sol_moru_t1",
+      "model": "Codex GPT-6.1-Sol",
+      "moru": true,
+      "sourceSha256": "90445c2e654e9efbe39adc33386c405fcabae245423e97e84f9a772f88bef61c",
+      "compiledSha256": "e6808ded210163a29fa90830f29ccd2b90f8789430915c81e65246ff284c57ff",
+      "htmlSha256": "f19ea6ae0a347f310447f235a86deb57aa13a8909411c0d21406432409439e3b",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_sol60_raw_t1",
+      "model": "Codex GPT-6-Sol",
+      "moru": false,
+      "sourceSha256": "46fe03eb6c40d6a8edb00071d3e3a2035037180d13bcaf32a7e2626e2020d8d3",
+      "compiledSha256": "f30b59677af614cb44548f3117bb1fe528b5b400f351543658b66f6914273ab9",
+      "htmlSha256": "5dace05957b2bf9514fe6f8b7ba292e15404232489fb1a5ea620f7fdc3f6ec30",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_sol60_moru_t1",
+      "model": "Codex GPT-6-Sol",
+      "moru": true,
+      "sourceSha256": "c5e5b21e764581740e97fb79373155d22973c72bd27f7c27b2cb299dc1ee1fe4",
+      "compiledSha256": "4b72caf24244b991da4b197f40f5784da281c0304cc403b00ebf1b4c8be876e4",
+      "htmlSha256": "276a672cdf3b4bcb9ca04dafb4682a6091902142a2f28b9ce6334366cea26951",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_luna6_raw_t1",
+      "model": "Codex GPT-6-Luna",
+      "moru": false,
+      "sourceSha256": "f5c1ae2c426df80aebc9f2e17afd82b593f0cf171190179072a89b9e0bb51586",
+      "compiledSha256": "20b47e5565aa302e0487045b3bd4a00abab77e5fbd39f9eaf4f1ca088009215a",
+      "htmlSha256": "12ce0cfcdce849bcb6883490f2f3fd5336e6cd4b3f8ddd8265fbb876af68e044",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_luna6_moru_t1",
+      "model": "Codex GPT-6-Luna",
+      "moru": true,
+      "sourceSha256": "06a5df5b3ff51cfaf25d6b7f8d09bca21fc95dd29dcecff3e06a195b1e07fb24",
+      "compiledSha256": "50f072cd6e54ea8c808e1afa2143326419816125a6638650ff2da4ceff7795a1",
+      "htmlSha256": "1d91a52d8eecff434907009fcf8600fd93e61d0dc14877d966941e348db815c3",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_sol56_raw_t1",
+      "model": "Codex GPT-5.6-Sol",
+      "moru": false,
+      "sourceSha256": "d9835b7e0bf92d3da614863ec2cd0c7756ca02fe2b4d3056241e4708be030aba",
+      "compiledSha256": "f15514cb47ea32500f9a841c13fc0c764bee424241351dc81a41fec20b238c7c",
+      "htmlSha256": "c306cf744e7e2c70d130922ac6c695dbf040c8e342f9ba916f0b2aa40fa7ed9a",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_sol56_moru_t1",
+      "model": "Codex GPT-5.6-Sol",
+      "moru": true,
+      "sourceSha256": "2463caa84ff8f414b220cdb8d84c7e2088046ee5ad66674b0666acab1fb7a6ff",
+      "compiledSha256": "8434881fa1880e1835bc90f0e790a2edac7b49b1789ef939c5fced3a611ab021",
+      "htmlSha256": "549216869d017e8c1e22de96e2cad4553239d814707b3cf99fcd638839fd91c6",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_terra56_raw_t1",
+      "model": "Codex GPT-5.6-Terra",
+      "moru": false,
+      "sourceSha256": "239ee7ed6ff4883b18a921d23b79370b55ec4e8bbb57f47876a02d197e1dc9d4",
+      "compiledSha256": "ac0b29231d43b8b8ec48923ccf539cd1281e6f0aad3f45092a81f5a2b457cbfa",
+      "htmlSha256": "e86778fe676260b725bbe3cdb875b5c1ae6a942441051a4ac8b32a1faf007c50",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_terra56_moru_t1",
+      "model": "Codex GPT-5.6-Terra",
+      "moru": true,
+      "sourceSha256": "aa0827bb247facf397a8150d247f25f78aa8237e05b4188bbe10d2991d34e4df",
+      "compiledSha256": "1d9931997662eb7ada0ab8e27c09488080164c9a577246b1c609cdc9d8921a92",
+      "htmlSha256": "f4c1dce82deec1a6717cb11a3f11f1c16c2a0ba4d13330c5993f1ff001e52c73",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_codex_luna_raw_t1",
+      "model": "Codex GPT-5.6-Luna",
+      "moru": false,
+      "sourceSha256": "150c106a47218971e607fee7f85f3ab029a9425bcfcdb1cadaeed299a5a76c51",
+      "compiledSha256": "9b614fb12aac91826e7cb584afe6e130508aafb1be4ba2914d03c9b1578fdb3b",
+      "htmlSha256": "a1f6755ed0e868226b84744ba9b4e38a3f9ea468f44a111906c3db73e494e4c5",
+      "historicalGateCount": 3
+    },
+    {
+      "trialId": "city_v2_luna_moru_t3",
+      "model": "Codex GPT-5.6-Luna",
+      "moru": true,
+      "sourceSha256": "96157ec0ba469ec7485259577ed655aaec98a57625cdfa97d9d5a506b936638e",
+      "compiledSha256": "d8499916ba63cd4556988f152c6057f6eb9e726d75a8a890b4ae8a7dda20603d",
+      "htmlSha256": "2ef4f96c6a6c49e814d280c703441636ffbad39721d7b8e04218ff0ee54aeb17",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_argo_raw_t1",
+      "model": "AGY Model 4 Argo",
+      "moru": false,
+      "sourceSha256": "3f290f27bdd5b4207d15556ee899ed0431b7a515888d17f6397b5b04ffc12baf",
+      "compiledSha256": "b8b0b0c917155ff640dc7809a9bb5dde9ef37db1ac3f5a451039617febdb3e86",
+      "htmlSha256": "9036aec1e0c893ef97c6cba4aa4858a471619312871480f101d11a226b1c742e",
+      "historicalGateCount": 5
+    },
+    {
+      "trialId": "city_v2_argo_moru_t1",
+      "model": "AGY Model 4 Argo",
+      "moru": true,
+      "sourceSha256": "5a296cb98071b1acfd8c90d87f952774c6d702dc087cce7a9203bf9c62530f39",
+      "compiledSha256": "34ec0016e233cd6e1f54257ae8f18260fd54d61d6a2ce22ca55e9efe4353f2f1",
+      "htmlSha256": "acf2d51ff5aa7a171308b5bd27ca882ecbe26e68a7c22dea9d699db7240d3e52",
+      "historicalGateCount": 9
+    },
+    {
+      "trialId": "city_agy_flash_raw_t2",
+      "model": "AGY Gemini 3.8 Flash",
+      "moru": false,
+      "sourceSha256": "a5d5971c8f69f9e9fa929a98cb0c63316feba3188b069c50e1ced050fae50c35",
+      "compiledSha256": "a5134d0d2dc01869f08676c44217cb9f9a2459a1d815e695b4762ea55d119b64",
+      "htmlSha256": "41e2323840a35015d76e0ce61b5107d5428ba1aac2e7e6bd891227b26799001e",
+      "historicalGateCount": 4
+    },
+    {
+      "trialId": "city_v2_flash_moru_t3",
+      "model": "AGY Gemini 3.8 Flash",
+      "moru": true,
+      "sourceSha256": "191743d5882228df5c4e044ccf288e965e65b421159b9a2249b5d4628b675043",
+      "compiledSha256": "4032a4a201d0b50a1873fa430819f3997f919062f8653bcf3c05526212c290eb",
+      "htmlSha256": "3b70518cb58c62b13d7f6b163b02ee219fbfdd476be4f42ad028a7e5ce91759e",
+      "historicalGateCount": 9
+    }
+  ]
+}

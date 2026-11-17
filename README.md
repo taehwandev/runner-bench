@@ -29,3 +29,7 @@ Twenty builds from the earlier browser 3D rocket test, kept as the models left t
 | 3, 8 | Gemini |
 
 Folders are named `rocket/stage<N>-<model>-<on|off>/`. Each has an `index.html`; Three.js loads from a CDN. One run per cell, so treat the results as a reference.
+
+## city-arena/
+
+The first two rounds of the 3D neon-city test, taken out of the Moru report and kept here byte for byte. `arena-34-arms.json` holds the 34 phase-1 builds (17 models, with and without Moru, with each build's source, compiled script and HTML shell). `phase-two-arms.json` holds the six phase-2 patch runs. `phase-one-manifest.json` lists the builds with their hashes, and `SHA256SUMS` lets you check the files (the phase-1 bundle hash matches `bundleSha256` in the manifest). These are static code checks from the time, not a full quality assessment of the output.
