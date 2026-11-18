@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c19">
+<title>Afterlight — Night Courier</title>
+<link rel="stylesheet" href="style.css">
+<script type="module" src="game.js"></script>
+</head>
+<body>
+<main id="stage" data-mode="ready">
+  <canvas id="city" aria-label="Afterlight 3D game"></canvas>
+  <div class="edge"></div>
+  <header class="top">
+    <div class="location"><i></i><span id="district">Lantern Mile</span></div>
+    <button id="sound" type="button" aria-label="Mute sound" aria-pressed="false">♫</button>
+  </header>
+  <div id="hud" hidden>
+    <div class="meter score"><span>SCORE</span><strong id="score">000000</strong></div>
+    <div class="meter chain"><span>COMBO</span><strong id="combo">×1</strong><i id="chain-bar"></i></div>
+    <div id="powers">
+      <div class="power" id="shield" hidden><span>◈ SHIELD</span><b></b><i></i></div>
+      <div class="power magnet" id="magnet" hidden><span>✦ MAGNET</span><b></b><i></i></div>
+    </div>
+    <div id="toast" aria-hidden="true"></div>
+    <div id="cue"><strong></strong><span></span></div>
+    <div class="pace"><span>PACE</span><strong id="pace">054</strong><span>KM/H</span></div>
+  </div>
+  <section class="screen" id="start" aria-labelledby="title">
+    <div class="identity">
+      <div class="eyebrow">NIGHT COURIER <i></i></div>
+      <h1 id="title">AFTER<span>LIGHT</span></h1>
+      <p>Thread the traffic. Chase the signal.</p>
+    </div>
+    <div class="console">
+      <div class="controls">
+        <div><b>← →</b><span>Change lane</span></div><div><b>↑</b><span>Jump</span></div><div><b>↓</b><span>Slide</span></div>
+      </div>
+      <p class="input-help">Swipe anywhere · Arrows / WASD</p>
+      <button class="primary" id="play" type="button" disabled>Start run <span aria-hidden="true">↗</span></button>
+    </div>
+  </section>
+  <section class="screen" id="over" aria-labelledby="over-title" hidden>
+    <div class="result">
+      <div class="eyebrow"><span id="cause">COLLISION</span><i></i></div>
+      <h2 id="over-title">SIGNAL<br><span>LOST</span></h2>
+      <div class="result-grid">
+        <div><span>RUN SCORE</span><strong id="total">0</strong></div>
+        <div><span>PERSONAL BEST</span><strong id="best">0</strong></div>
+      </div>
+    </div>
+    <div class="console"><button class="primary" id="again" type="button">Run again <span aria-hidden="true">↗</span></button></div>
+  </section>
+  <section class="screen error" id="error" hidden>
+    <div><h2>Signal unavailable</h2><p id="error-text">This game needs WebGL 2. Enable hardware acceleration and reload.</p><button class="primary" id="reload" type="button">Reload <span aria-hidden="true">↗</span></button></div>
+  </section>
+</main>
+</body>
+</html>

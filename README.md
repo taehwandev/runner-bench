@@ -1,6 +1,6 @@
 # runner-bench
 
-Six playable 3D neon-night-city endless runners (portrait phone screen, Three.js from a CDN), built on 2026-11-15 from one prompt by three AI models, each once with Moru and once without ("raw"). One run per build, so this is a reference, not a ranking.
+Eight playable 3D neon-night-city endless runners (portrait phone screen), built from one prompt by four AI models, each once with Moru and once without ("raw"): three models on 2026-11-15 (Three.js from a CDN) and Sol 6.2 on 2026-11-18 (plain WebGL). One run per build, so this is a reference, not a ranking.
 
 The folders are the generated output, kept byte-for-byte as the models left them. Nothing was edited, split or cleaned up afterwards.
 
@@ -11,6 +11,9 @@ Conditions: medium reasoning, empty folder, 45-minute limit.
 | Opus 5.5 | `moru-opus/` NIGHT LINE, 41m13s, $8.53 | `raw-opus/` NEON NIGHTRUN, 33m43s, $6.38 |
 | Sol 6.1 | `moru-sol/` AFTER HOURS, 15m52s | `raw-sol/` AFTERHOURS, 8m19s |
 | Gemini 4 Carbon | `moru-carbon/` NEON OVERDRIVE, 22m42s | `raw-carbon/` NEON RUSH, 30m59s |
+| Sol 6.2 (added 2026-11-18) | `moru-sol62/` AFTERLIGHT, 26m30s | `raw-sol62/` NIGHT SHIFT, 21m17s |
+
+Sol 6.2 was run on 2026-11-18 with the same prompt and conditions. Both 6.2 builds draw with WebGL directly instead of Three.js, so they need no internet.
 
 Only Opus reported a cost. Token counters differ per CLI, so do not compare them across models.
 

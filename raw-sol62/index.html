@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#080b19">
+  <title>Night Shift — Neon Courier</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="render.js" defer></script>
+  <script src="city.js" defer></script>
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <main id="game" aria-label="Night Shift endless runner">
+    <canvas id="world" aria-hidden="true"></canvas>
+    <div class="frame" aria-hidden="true"></div>
+    <div id="impact" aria-hidden="true"></div>
+    <header class="top">
+      <div class="brand"><span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i></span><span>AFTER HOURS<small>COURIER SERVICE</small></span></div>
+      <button id="sound" type="button" aria-label="Mute sound" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z"/><path class="waves" d="M16 9a4 4 0 0 1 0 6m2.5-8.5a8 8 0 0 1 0 11"/><path class="mute" d="m16 10 5 5m0-5-5 5"/></svg></button>
+    </header>
+
+    <section id="menu" class="screen" aria-labelledby="title">
+      <div class="title-block">
+        <div class="eyebrow"><span></span> MIDNIGHT DELIVERY <span></span></div>
+        <h1 id="title">NIGHT<span>SHIFT</span></h1>
+        <p>Chain pickups and near misses.</p>
+      </div>
+      <div class="menu-bottom">
+        <div class="controls" aria-label="Swipe controls">
+          <div><b>← →</b><span>DODGE</span></div>
+          <div><b>↑</b><span>JUMP</span></div>
+          <div><b>↓</b><span>SLIDE</span></div>
+        </div>
+        <button class="action" id="start" type="button"><span>START RUN</span><b aria-hidden="true">↗</b></button>
+        <p class="keyboard">SWIPE TO MOVE <i></i> ARROWS / WASD</p>
+      </div>
+    </section>
+
+    <section id="hud" hidden aria-label="Run stats">
+      <div class="readouts">
+        <div><small>SCORE</small><strong id="score">000000</strong></div>
+        <div class="combo"><small>COMBO</small><strong id="combo">×1</strong><div class="meter"><i id="combo-fill"></i></div></div>
+      </div>
+      <div id="district"><i></i><span>NEON ROW</span></div>
+      <div id="powers">
+        <div id="shield" class="power" hidden><b>◇ SHIELD</b><span></span><i></i></div>
+        <div id="magnet" class="power" hidden><b>⌁ MAGNET</b><span></span><i></i></div>
+      </div>
+      <div id="toast" aria-live="off"></div>
+      <div id="cue"></div>
+    </section>
+
+    <section id="over" class="screen" aria-labelledby="over-title" hidden>
+      <div class="finish">
+        <div class="eyebrow"><span></span> DELIVERY ENDED <span></span></div>
+        <h2 id="over-title">SHIFT<span>OVER</span></h2>
+        <p id="reason"></p>
+        <div class="results">
+          <div><small>SCORE</small><strong id="final-score">0</strong></div>
+          <div><small>PERSONAL BEST</small><strong id="best">0</strong></div>
+        </div>
+      </div>
+      <div class="menu-bottom">
+        <button class="action" id="retry" type="button"><span>RUN AGAIN</span><b aria-hidden="true">↻</b></button>
+        <p class="keyboard">TAP TO RESTART <i></i> ENTER / SPACE</p>
+      </div>
+    </section>
+    <p id="error" hidden>Night Shift needs WebGL 2. Enable hardware acceleration and reload.</p>
+  </main>
+</body>
+</html>
