@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Borealis Line — Armored Train at Dusk</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="viewport-shell" aria-label="Cinematic 3D Armored Train Scene">
+      <div id="stage-frame" class="stage-frame">
+        <canvas
+          id="scene-canvas"
+          aria-label="3D armored train crossing a frozen city at dusk"
+        ></canvas>
+
+        <div id="ui-layer" class="ui-layer">
+          <header class="hud-top" aria-live="polite">
+            <div class="hud-pill">
+              <span id="shot-badge" class="shot-badge">SHOT 01 / 08</span>
+              <span class="hud-sep" aria-hidden="true">·</span>
+              <span id="shot-title" class="shot-title">Canyon Dusk</span>
+            </div>
+            <div class="hud-pill hud-timer" id="time-readout">
+              00.0s / 60.0s
+            </div>
+          </header>
+
+          <section
+            id="start-overlay"
+            class="modal-card"
+            aria-labelledby="scene-heading"
+          >
+            <p class="eyebrow">TRANS-ARCTIC ELEVATED CORRIDOR</p>
+            <h1 id="scene-heading" class="modal-title">Borealis Dreadnought</h1>
+            <p class="modal-copy">
+              Sixty seconds across a frozen city at dusk — viaduct canyon,
+              Sector 04 station, monolith tunnel, and night bridge.
+            </p>
+            <div class="modal-actions">
+              <button id="start-btn" type="button" class="btn-primary">
+                Start
+              </button>
+            </div>
+            <p class="modal-hint">
+              Space / Tap to pause · Right Arrow / Swipe to skip shot
+            </p>
+          </section>
+
+          <section
+            id="replay-overlay"
+            class="modal-card is-hidden"
+            aria-labelledby="replay-heading"
+          >
+            <p class="eyebrow">END OF TRANSIT · 60.0s</p>
+            <h2 id="replay-heading" class="modal-title">Into the Winter Night</h2>
+            <p class="modal-copy">
+              The armored consist has cleared the glacial span. Run the
+              timetable again from dusk departure.
+            </p>
+            <div class="modal-actions">
+              <button id="replay-btn" type="button" class="btn-primary">
+                Replay
+              </button>
+            </div>
+          </section>
+
+          <footer id="hud-bottom" class="hud-bottom is-hidden">
+            <div
+              id="shot-rail"
+              class="shot-rail"
+              role="progressbar"
+              aria-label="Scene timeline progress"
+              aria-valuemin="0"
+              aria-valuemax="60"
+              aria-valuenow="0"
+            >
+              <span class="shot-seg" data-shot="1"><i class="seg-fill"></i></span>
+              <span class="shot-seg" data-shot="2"><i class="seg-fill"></i></span>
+              <span class="shot-seg" data-shot="3"><i class="seg-fill"></i></span>
+              <span class="shot-seg" data-shot="4"><i class="seg-fill"></i></span>
+              <span class="shot-seg" data-shot="5"><i class="seg-fill"></i></span>
+              <span class="shot-seg" data-shot="6"><i class="seg-fill"></i></span>
+              <span class="shot-seg" data-shot="7"><i class="seg-fill"></i></span>
+              <span class="shot-seg" data-shot="8"><i class="seg-fill"></i></span>
+            </div>
+
+            <div class="controls-row">
+              <button
+                id="play-pause-btn"
+                type="button"
+                class="btn-control"
+                aria-label="Pause playback"
+              >
+                <span id="play-pause-label">Pause</span>
+              </button>
+
+              <span id="phase-status" class="phase-status">
+                Viaduct · 28.0 m/s
+              </span>
+
+              <button
+                id="next-shot-btn"
+                type="button"
+                class="btn-control"
+                aria-label="Skip to next camera shot"
+              >
+                <span>Next Shot</span>
+              </button>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

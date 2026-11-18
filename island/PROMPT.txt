@@ -1,0 +1,28 @@
+Build a short cinematic 3D scene in the current empty folder: a small tropical
+island in open ocean, seen in a 60-second time-lapse from late afternoon
+through sunset to a starry night.
+
+Deliverable
+- Runs by serving the folder statically and opening index.html (no build step).
+  Three.js from a pinned CDN version is allowed. No other external assets: all
+  visuals are code-generated, all sounds via WebAudio.
+- Exactly 60 seconds, plays once from a Start button, then shows Replay.
+- Portrait 9:16 framing (target 1080x1920); letterbox on other aspect ratios so
+  every shot keeps the same composition.
+- Ocean with moving waves, foam where water meets the shore, and reflections
+  that change with the light. Island with cliffs, a beach, trees that sway,
+  and a lighthouse whose beam turns on at dusk.
+- Sky, sun, clouds and fog change color over the 60 seconds; stars appear at
+  night. A coherent palette.
+- At least four camera shots with deliberate cuts or moves (for example a
+  distant approach over the water, a slow orbit around the island, a low pass
+  along the beach, a final pull-back as the lighthouse sweeps the night).
+- Deterministic: the same time always renders the same frame (seeded
+  randomness, no frame-rate dependent motion).
+- Pause/resume and skip-to-next-shot with touch and keyboard.
+- Smooth on a phone GPU: cap devicePixelRatio, aim for a stable 60fps.
+- Expose window.__scene = { shot, time, playing, seek(t) } where seek(t) jumps
+  to t seconds and renders that frame, for automated checks and frame capture.
+
+Spend your time on visual quality and pacing. Stop when the scene is finished
+and polished.

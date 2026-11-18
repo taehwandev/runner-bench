@@ -4,3 +4,5 @@ raw-*/** linguist-generated -whitespace
 rocket/** linguist-generated -whitespace
 spaceship/** linguist-generated -whitespace
 city-arena/** linguist-generated -whitespace
+island/*/** linguist-generated -whitespace
+train/*/** linguist-generated -whitespace

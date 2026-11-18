@@ -1,0 +1,74 @@
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; background: #000; overflow: hidden;
+  overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+}
+body {
+  font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Roboto, system-ui, sans-serif;
+  color: #f4ead8; -webkit-font-smoothing: antialiased;
+}
+
+/* 9:16 stage, letterboxed and centred; JS sets the pixel size and font-size */
+#stage {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(100vw, 56.25vh); height: min(100vh, 177.78vw);
+  overflow: hidden; background: #000; font-size: 10px;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 85% at 50% 48%, rgba(0, 0, 0, 0) 52%, rgba(3, 4, 12, 0.34) 100%);
+}
+#fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
+
+/* transport */
+#hud { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; }
+#hud.on, .paused #hud { opacity: 1; }
+#track { position: absolute; left: 0; right: 0; bottom: 0; height: 0.28em; background: rgba(255, 255, 255, 0.12); }
+#bar { height: 100%; background: rgba(255, 226, 170, 0.85); transform-origin: 0 50%; transform: scaleX(0); }
+#buttons {
+  position: absolute; left: 0; right: 0; bottom: 3.2em; display: flex; justify-content: center; gap: 2.2em;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+#buttons button {
+  pointer-events: auto; width: 5.6em; height: 5.6em; min-width: 48px; min-height: 48px; border-radius: 50%;
+  border: 1px solid rgba(255, 240, 215, 0.45); background: rgba(8, 12, 24, 0.42);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: grid; place-items: center; cursor: pointer; padding: 0; color: #fff3de; font-size: inherit;
+}
+#buttons button:hover { background: rgba(8, 12, 24, 0.62); }
+button:focus-visible { outline: 2px solid #ffe2aa; outline-offset: 3px; }
+.ico { display: block; position: relative; width: 1.9em; height: 1.9em; }
+.ico::before, .ico::after { content: ""; position: absolute; top: 0.2em; bottom: 0.2em; background: currentColor; }
+[data-icon="pause"] .ico::before { left: 0.3em; width: 0.45em; }
+[data-icon="pause"] .ico::after { right: 0.3em; width: 0.45em; }
+[data-icon="play"] .ico::before { left: 0.5em; right: 0.15em; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+[data-icon="play"] .ico::after { display: none; }
+[data-icon="next"] .ico::before { left: 0.2em; right: 0.6em; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+[data-icon="next"] .ico::after { right: 0.25em; width: 0.26em; }
+
+/* title cards */
+.card {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 0 3em 6em;
+  background: linear-gradient(180deg, rgba(4, 6, 16, 0.50) 0%, rgba(4, 6, 16, 0.22) 45%, rgba(4, 6, 16, 0.66) 100%);
+}
+.card[hidden], #hud[hidden] { display: none; }
+#end { background: rgba(0, 0, 0, 0.9); animation: rise 0.9s ease both; }
+.kicker { margin: 0 0 1.1em; font-size: 1.25em; letter-spacing: 0.34em; text-transform: uppercase; opacity: 0.82; }
+h1 {
+  margin: 0; font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-weight: 400;
+  font-size: 5.6em; line-height: 1.05; letter-spacing: 0.02em; text-shadow: 0 0.04em 0.5em rgba(0, 0, 0, 0.45);
+}
+.sub { margin: 1em 0 0; font-size: 1.5em; line-height: 1.45; max-width: 19em; opacity: 0.9; }
+.cta {
+  margin-top: 2.6em; font: inherit; font-size: 1.55em; letter-spacing: 0.26em; text-transform: uppercase;
+  color: #1b1408; background: #ffe2aa; border: 0; border-radius: 99em; padding: 0.95em 2.6em 0.95em 2.86em;
+  min-height: 48px; cursor: pointer; transition: transform 0.2s ease, background 0.2s ease, opacity 0.4s ease;
+}
+.cta:hover { background: #fff0cf; transform: translateY(-1px); }
+.cta:disabled { opacity: 0.45; cursor: progress; }
+.note { margin: 2.2em 0 0; font-size: 1.12em; line-height: 1.6; letter-spacing: 0.04em; opacity: 0.72; max-width: 24em; }
+@keyframes rise { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #end { animation: none; } #hud, .cta { transition: none; } }

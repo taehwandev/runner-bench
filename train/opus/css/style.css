@@ -1,0 +1,115 @@
+/* Letterboxed 9:16 stage. --fh is the frame height in px, set by main.js, so
+   overlay type scales with the picture rather than the window. */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; background: #000; color: #eef2f8; overflow: hidden;
+  font-family: "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+#stage { position: fixed; inset: 0; background: #000; }
+#frame {
+  --fh: 900px;
+  position: absolute; left: 0; top: 0; overflow: hidden; background: #000;
+  user-select: none; -webkit-user-select: none; touch-action: none;
+}
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* ----------------------------------------------------------- in-film titles */
+#titles { position: absolute; inset: 0; pointer-events: none; }
+#titleCard, #endCard {
+  position: absolute; left: 0; right: 0; text-align: center; opacity: 0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+}
+#titleCard { top: 13%; }
+#titleCard h1 {
+  margin: 0; font-weight: 300; letter-spacing: 0.42em; padding-left: 0.42em;
+  font-size: calc(var(--fh) * 0.05);
+}
+#titleCard p, #endCard p {
+  margin: calc(var(--fh) * 0.012) 0 0; font-size: calc(var(--fh) * 0.016);
+  letter-spacing: 0.32em; text-transform: uppercase; opacity: 0.8;
+}
+#endCard { top: 46%; }
+#endCard p { font-size: calc(var(--fh) * 0.022); letter-spacing: 0.5em; font-weight: 300; opacity: 1; }
+
+/* ----------------------------------------------------------- controls */
+#tapLayer { position: absolute; inset: 0; }
+#pauseBadge {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: calc(var(--fh) * 0.012);
+  pointer-events: none; color: #fff;
+}
+#pauseBadge svg {
+  width: calc(var(--fh) * 0.075); height: calc(var(--fh) * 0.075); padding: calc(var(--fh) * 0.018);
+  fill: currentColor; background: rgba(8, 12, 20, 0.55); border-radius: 50%;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#pauseBadge span {
+  font-size: calc(var(--fh) * 0.015); letter-spacing: 0.18em; text-transform: uppercase;
+  background: rgba(8, 12, 20, 0.55); padding: 0.45em 0.9em; border-radius: 999px;
+}
+#pauseBadge[hidden] { display: none; }
+
+#hud {
+  position: absolute; left: 3.5%; right: 3.5%; bottom: calc(2.2% + env(safe-area-inset-bottom, 0px));
+  display: flex; align-items: center; gap: calc(var(--fh) * 0.012);
+  padding: calc(var(--fh) * 0.008) calc(var(--fh) * 0.012);
+  background: rgba(6, 9, 16, 0.5); border-radius: 999px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: opacity 0.35s ease; opacity: 1;
+}
+#hud[hidden] { display: none; }
+#hud.dim { opacity: 0; pointer-events: none; }
+#hud.dim:focus-within { opacity: 1; pointer-events: auto; }
+#hud.arming { pointer-events: none; }
+#hud button {
+  flex: none; display: grid; place-items: center; cursor: pointer;
+  width: max(44px, calc(var(--fh) * 0.046)); height: max(44px, calc(var(--fh) * 0.046));
+  border: 0; border-radius: 50%; background: transparent; color: #fff; padding: 0;
+}
+#hud button:hover { background: rgba(255, 255, 255, 0.12); }
+#hud button:focus-visible { outline: 2px solid #9cc4ff; outline-offset: 1px; }
+#hud svg { width: 56%; height: 56%; fill: currentColor; }
+#pauseBtn .i-play, #pauseBtn.paused .i-pause { display: none; }
+#pauseBtn.paused .i-play { display: block; }
+#muteBtn .i-muted, #muteBtn.muted .i-sound { display: none; }
+#muteBtn.muted .i-muted { display: block; }
+#progress { position: relative; flex: 1; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.22); }
+#progress { cursor: pointer; }
+#progress::before { content: ''; position: absolute; left: 0; right: 0; top: -16px; bottom: -16px; }
+#progressFill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 2px; background: #f1d3a6; }
+#ticks i { position: absolute; top: -3px; width: 2px; height: 10px; margin-left: -1px; background: rgba(255, 255, 255, 0.5); border-radius: 1px; }
+#clock {
+  flex: none; min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums;
+  font-size: max(12px, calc(var(--fh) * 0.014)); opacity: 0.85;
+}
+
+/* ----------------------------------------------------------- start / end */
+.overlay {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  background: radial-gradient(ellipse at 50% 55%, rgba(4, 7, 14, 0.35), rgba(2, 3, 8, 0.85));
+}
+.overlay[hidden] { display: none; }
+/* the end card sits below the in-film "into the night" line instead of on top of it */
+#endScreen { align-items: start; padding-top: calc(var(--fh) * 0.56); background: transparent; }
+.card { padding: 0 8%; }
+.kicker { margin: 0 0 1.2em; font-size: max(11px, calc(var(--fh) * 0.014)); letter-spacing: 0.4em; text-transform: uppercase; opacity: 0.7; }
+.overlay h2 { margin: 0; font-weight: 300; font-size: calc(var(--fh) * 0.056); letter-spacing: 0.4em; padding-left: 0.4em; }
+.sub { margin: 0.8em 0 0; font-size: max(13px, calc(var(--fh) * 0.017)); letter-spacing: 0.12em; opacity: 0.85; }
+.hint { margin: 2.2em 0 0; font-size: max(11px, calc(var(--fh) * 0.013)); opacity: 0.6; line-height: 1.6; }
+.cta {
+  margin-top: calc(var(--fh) * 0.04); min-width: 44px; min-height: 44px; cursor: pointer;
+  padding: calc(var(--fh) * 0.014) calc(var(--fh) * 0.05);
+  font: inherit; font-size: max(15px, calc(var(--fh) * 0.02)); letter-spacing: 0.3em; text-transform: uppercase;
+  color: #10141c; background: #f1d3a6; border: 0; border-radius: 999px;
+  box-shadow: 0 6px 30px rgba(241, 190, 120, 0.35);
+}
+.cta:hover { background: #ffe2b8; }
+.cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+#error {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 10%;
+  text-align: center; background: #05070c; font-size: 15px; line-height: 1.5;
+}
+#error[hidden] { display: none; }

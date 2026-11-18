@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Frostline — a 60 second train film</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="stage">
+    <div id="frame">
+      <canvas id="view"></canvas>
+
+      <div id="titles" aria-hidden="true">
+        <div id="titleCard"><h1 data-text="title"></h1><p data-text="subtitle"></p></div>
+        <div id="endCard"><p data-text="endLine"></p></div>
+      </div>
+
+      <div id="tapLayer"></div>
+      <div id="pauseBadge" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        <span id="pauseShot"></span>
+      </div>
+
+      <div id="hud">
+        <button id="pauseBtn" type="button" aria-label="Pause">
+          <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+        </button>
+        <div id="progress" role="progressbar" aria-label="Film progress" aria-valuemin="0" aria-valuemax="60">
+          <div id="progressFill"></div>
+          <div id="ticks"></div>
+        </div>
+        <span id="clock">0:00</span>
+        <button id="nextBtn" type="button" aria-label="Next shot">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.2v11.6a.8.8 0 0 0 1.25.66L14 13v4.8a.8.8 0 0 0 1.25.66l8-5.8a.8.8 0 0 0 0-1.32l-8-5.8A.8.8 0 0 0 14 6.2V11L6.25 5.54A.8.8 0 0 0 5 6.2z" transform="translate(-2 0)"/></svg>
+        </button>
+        <button id="muteBtn" type="button" aria-label="Mute sound">
+          <svg class="i-sound" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg class="i-muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <section id="startScreen" class="overlay">
+        <div class="card">
+          <p class="kicker">A 60-second film</p>
+          <h2 data-text="title"></h2>
+          <p class="sub" data-text="subtitle"></p>
+          <button id="startBtn" class="cta" type="button">Start</button>
+          <p class="hint">Sound on · tap or Space to pause · swipe or → for the next shot</p>
+        </div>
+      </section>
+
+      <section id="endScreen" class="overlay" hidden>
+        <div class="card">
+          <p class="sub">Night Service 7 has crossed the bay.</p>
+          <button id="replayBtn" class="cta" type="button">Replay</button>
+        </div>
+      </section>
+
+      <div id="error" hidden></div>
+    </div>
+  </div>
+  <script type="module" src="js/main.js"></script>
+  <script>
+    // If the module graph (or the pinned three.js CDN) fails to load, say so instead of a dead Start button.
+    setTimeout(function () {
+      if (window.__scene) return;
+      var el = document.getElementById('error');
+      el.textContent = 'The film could not load. Check your connection and reload the page.';
+      el.hidden = false;
+    }, 15000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+Build a short cinematic 3D scene in the current empty folder: a long armored
+train crossing a frozen, snow-buried city at dusk on an elevated track.
+
+Deliverable
+- Runs by serving the folder statically and opening index.html (no build step).
+  Three.js from a pinned CDN version is allowed. No other external assets: all
+  visuals are code-generated, all sounds via WebAudio.
+- Exactly 60 seconds, plays once from a Start button, then shows Replay.
+- Portrait 9:16 framing (target 1080x1920); letterbox on other aspect ratios so
+  every shot keeps the same composition.
+- The train has a locomotive and at least 8 cars, lit windows, a headlight on
+  the track, and steam or exhaust. Snow falls the whole time; the city has
+  layered towers, fog and depth so it feels huge.
+- Fixed timetable the scene must follow:
+  - 0-24 s: the train runs along the elevated track between towers.
+  - 24-30 s: it slows down and stops at an elevated station platform.
+  - 30-34 s: it stands still at the platform (speed exactly 0).
+  - 34-40 s: it pulls away and speeds up.
+  - 40-46 s: the whole train passes through a tunnel inside a tower block.
+  - 46-60 s: it comes out and crosses a long bridge into the night.
+- At least four camera shots with deliberate cuts or moves (for example a wide
+  establishing shot, tracking alongside the cars, a low angle as it passes
+  overhead, inside or out of the tunnel). The train must read clearly in
+  every shot.
+- Deterministic: the same time always renders the same frame (seeded
+  randomness, no frame-rate dependent motion).
+- Pause/resume and skip-to-next-shot with touch and keyboard.
+- Smooth on a phone GPU: cap devicePixelRatio, aim for a stable 60fps.
+- Expose window.__scene = { shot, time, playing, seek(t), train } where
+  seek(t) jumps to t seconds and renders that frame, and train is
+  { distance, speed, cars, atStation, inTunnel } describing the train at the
+  current time (distance in meters along the track, speed in m/s).
+
+Spend your time on visual quality and pacing. Stop when the scene is finished
+and polished.

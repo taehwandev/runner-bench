@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Island — 60s Time-Lapse</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="viewport" aria-label="Tropical island 60-second time-lapse">
+    <div id="stage">
+      <canvas id="scene-canvas" aria-label="3D tropical island scene"></canvas>
+
+      <!-- Subtle film vignette -->
+      <div id="vignette" aria-hidden="true"></div>
+
+      <!-- Top minimal status bar -->
+      <header id="top-hud" class="hud-layer" aria-live="polite">
+        <div class="hud-pill hud-time">
+          <span id="shot-label">I · APPROACH</span>
+          <span class="hud-sep" aria-hidden="true">·</span>
+          <span id="time-display">00:00 / 01:00</span>
+        </div>
+        <button id="btn-mute" class="hud-icon-btn" type="button" aria-label="Toggle sound" title="Mute / Unmute (M)">
+          <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Bottom controls & timeline -->
+      <footer id="bottom-hud" class="hud-layer">
+        <div id="controls-row">
+          <button id="btn-play-pause" class="hud-btn" type="button" aria-label="Pause or resume" title="Play / Pause (Space)">
+            <svg id="icon-pause" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+              <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+              <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            </svg>
+            <svg id="icon-play" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" hidden>
+              <polygon points="6 4 20 12 6 20 6 4"></polygon>
+            </svg>
+            <span id="play-pause-text">Pause</span>
+          </button>
+
+          <button id="btn-next-shot" class="hud-btn" type="button" aria-label="Skip to next shot" title="Next shot (Right Arrow)">
+            <span>Next Shot</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+              <polygon points="4 5 14 12 4 19 4 5"></polygon>
+              <rect x="16" y="5" width="3" height="14" rx="0.8"></rect>
+            </svg>
+          </button>
+        </div>
+
+        <div id="progress-track" aria-hidden="true">
+          <div id="progress-fill"></div>
+          <div id="shot-markers"></div>
+        </div>
+      </footer>
+
+      <!-- Start Overlay -->
+      <section id="overlay-start" class="cinematic-overlay is-visible" aria-label="Start scene">
+        <div class="overlay-card">
+          <p class="overlay-kicker">60-SECOND TIME-LAPSE</p>
+          <h1 class="overlay-title">Solstice Isle</h1>
+          <p class="overlay-sub">Late afternoon through sunset to a starry night</p>
+          <button id="btn-start" class="primary-btn" type="button">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+              <polygon points="6 4 20 12 6 20 6 4"></polygon>
+            </svg>
+            <span>Start</span>
+          </button>
+          <p class="overlay-hint">Tap to pause · Swipe or → to skip shot</p>
+        </div>
+      </section>
+
+      <!-- Replay Overlay -->
+      <section id="overlay-replay" class="cinematic-overlay" aria-label="Replay scene">
+        <div class="overlay-card">
+          <p class="overlay-kicker">FIN</p>
+          <h2 class="overlay-title">Solstice Isle</h2>
+          <p class="overlay-sub">01:00 complete</p>
+          <button id="btn-replay" class="primary-btn" type="button">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+            <span>Replay</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

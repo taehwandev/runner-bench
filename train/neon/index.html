@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#05070b" />
+  <title>WINTERLINE — Armored Dusk Crossing</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="viewport" aria-label="Cinematic 3D Train Scene">
+    <div id="stage">
+      <canvas id="scene-canvas" aria-label="3D armored train crossing a frozen dusk city"></canvas>
+
+      <!-- Subtle atmospheric vignette -->
+      <div class="vignette" aria-hidden="true"></div>
+
+      <!-- Top minimal telemetry / shot badge (visible during playback) -->
+      <header id="top-bar" class="hud-bar hud-top" aria-live="polite">
+        <div class="shot-pill">
+          <span id="shot-index" class="shot-num">01</span>
+          <span class="shot-sep" aria-hidden="true">/</span>
+          <span id="shot-name" class="shot-label">Frozen Skyline</span>
+        </div>
+        <div id="time-readout" class="time-pill" aria-label="Elapsed time">00:00 / 01:00</div>
+      </header>
+
+      <!-- Bottom playback controls (always tap-accessible, touch + keyboard) -->
+      <footer id="bottom-bar" class="hud-bar hud-bottom">
+        <div class="progress-track" id="progress-track" role="progressbar" aria-label="Playback progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0">
+          <div id="progress-fill" class="progress-fill"></div>
+          <div id="shot-markers" class="shot-markers" aria-hidden="true"></div>
+        </div>
+        <div class="controls-row">
+          <button id="btn-play-pause" class="ctrl-btn" type="button" aria-label="Pause playback" title="Pause / Resume (Space)">
+            <span id="icon-pause" class="btn-icon" aria-hidden="true">❚❚</span>
+            <span id="icon-play" class="btn-icon hidden" aria-hidden="true">▶</span>
+            <span id="label-play-pause" class="btn-text">Pause</span>
+          </button>
+
+          <button id="btn-next-shot" class="ctrl-btn" type="button" aria-label="Skip to next shot" title="Next Shot (Right Arrow / N)">
+            <span class="btn-text">Next Shot</span>
+            <span class="btn-icon" aria-hidden="true">⏭</span>
+          </button>
+
+          <button id="btn-mute" class="ctrl-btn ctrl-icon-only" type="button" aria-label="Mute audio" aria-pressed="false" title="Toggle Audio (M)">
+            <svg id="icon-sound-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+            <svg id="icon-sound-off" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+        </div>
+      </footer>
+
+      <!-- Start Overlay -->
+      <section id="overlay-start" class="overlay overlay-visible" aria-label="Start scene">
+        <div class="overlay-card">
+          <p class="eyebrow">01:00 · 9:16 REALTIME 3D</p>
+          <h1 class="title">WINTERLINE</h1>
+          <p class="subtitle">Armored Express · Sector 09 Dusk Crossing</p>
+          <button id="btn-start" class="primary-btn" type="button">
+            <span class="primary-btn-icon" aria-hidden="true">▶</span>
+            <span>Start</span>
+          </button>
+          <p class="hint">Space / Tap to pause · → / Swipe for next shot</p>
+        </div>
+      </section>
+
+      <!-- Replay Overlay -->
+      <section id="overlay-replay" class="overlay" aria-label="Replay scene" aria-hidden="true">
+        <div class="overlay-card">
+          <p class="eyebrow">END OF LINE · 01:00</p>
+          <h2 class="title">WINTERLINE</h2>
+          <p class="subtitle">The convoy has crossed into the frozen night.</p>
+          <button id="btn-replay" class="primary-btn" type="button">
+            <span class="primary-btn-icon" aria-hidden="true">↻</span>
+            <span>Replay</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

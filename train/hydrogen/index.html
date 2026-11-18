@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>IRON DUSK — Armored Transit</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #03050a;
+      color: #edf2f8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    #letterbox {
+      width: 100dvw;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #03050a;
+    }
+
+    #stage-frame {
+      position: relative;
+      aspect-ratio: 9 / 16;
+      background: #0b1220;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.85);
+    }
+
+    #scene-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: pan-y;
+    }
+
+    /* Cinematic vignette */
+    .vignette {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at 50% 48%,
+        rgba(4, 7, 14, 0) 58%,
+        rgba(3, 5, 11, 0.56) 100%
+      );
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      background: linear-gradient(
+        180deg,
+        rgba(5, 8, 16, 0.35) 0%,
+        rgba(5, 8, 16, 0.52) 55%,
+        rgba(4, 7, 14, 0.72) 100%
+      );
+      z-index: 10;
+    }
+
+    .overlay[hidden],
+    #hud-bar[hidden],
+    #icon-pause[hidden],
+    #icon-play[hidden] {
+      display: none !important;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #8faad0;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: clamp(1.75rem, 1rem + 3vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #f4f7fb;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.65);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      color: #b7c8de;
+      margin-bottom: 30px;
+    }
+
+    .cta-btn {
+      min-width: 152px;
+      min-height: 48px;
+      padding: 12px 28px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 206, 142, 0.55);
+      background: rgba(18, 25, 39, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff3de;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), inset 0 0 14px rgba(255, 174, 82, 0.16);
+      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .cta-btn:hover {
+      background: rgba(34, 45, 68, 0.9);
+      border-color: rgba(255, 214, 158, 0.85);
+    }
+
+    .cta-btn:active {
+      transform: scale(0.97);
+    }
+
+    .cta-btn:focus-visible,
+    .ctrl-btn:focus-visible {
+      outline: 2px solid #ffd48a;
+      outline-offset: 3px;
+    }
+
+    .hint {
+      margin-top: 18px;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: rgba(185, 203, 226, 0.72);
+    }
+
+    /* Bottom HUD controls inside 9:16 safe area */
+    #hud-bar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: max(12px, env(safe-area-inset-bottom, 12px));
+      z-index: 8;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(8, 13, 24, 0.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(170, 198, 232, 0.16);
+    }
+
+    .hud-progress-track {
+      width: 100%;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      overflow: hidden;
+    }
+
+    #hud-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #74b9ff 0%, #ffb76b 100%);
+    }
+
+    .hud-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ctrl-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(184, 210, 240, 0.22);
+      background: rgba(22, 32, 49, 0.72);
+      color: #ebf2fa;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(38, 53, 79, 0.88);
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.96);
+    }
+
+    .hud-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #hud-shot {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: #a9c4e6;
+    }
+
+    #hud-time {
+      font-size: 0.76rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: #eaf0f8;
+    }
+  </style>
+</head>
+<body>
+  <main id="letterbox">
+    <div id="stage-frame">
+      <canvas id="scene-canvas" aria-label="Armored train crossing a frozen city at dusk"></canvas>
+      <div class="vignette"></div>
+
+      <div id="start-overlay" class="overlay">
+        <div class="eyebrow">SECTOR 09 // ELEVATED LINE</div>
+        <h1 class="title">IRON DUSK</h1>
+        <p class="subtitle">60s Realtime 3D &middot; Portrait 9:16</p>
+        <button id="btn-start" class="cta-btn" type="button">Start</button>
+        <p class="hint">Space / Tap to Pause &middot; &rarr; / Swipe for Next Shot</p>
+      </div>
+
+      <div id="replay-overlay" class="overlay" hidden>
+        <div class="eyebrow">01:00 // NIGHT CROSSING</div>
+        <h2 class="title">END OF LINE</h2>
+        <p class="subtitle">Armored Transit Complete</p>
+        <button id="btn-replay" class="cta-btn" type="button">Replay</button>
+      </div>
+
+      <div id="hud-bar" hidden>
+        <div class="hud-progress-track" aria-hidden="true">
+          <div id="hud-progress-fill"></div>
+        </div>
+        <div class="hud-row">
+          <div class="hud-controls">
+            <button id="btn-play-pause" class="ctrl-btn" type="button" aria-label="Pause">
+              <svg id="icon-pause" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <rect x="3" y="2.5" width="3.5" height="11" rx="0.8" />
+                <rect x="9.5" y="2.5" width="3.5" height="11" rx="0.8" />
+              </svg>
+              <svg id="icon-play" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" hidden>
+                <path d="M4 2.5L13.5 8L4 13.5V2.5Z" />
+              </svg>
+            </button>
+            <button id="btn-next-shot" class="ctrl-btn" type="button" aria-label="Next shot">
+              <span>Shot</span>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M2.5 3L9.5 8L2.5 13V3ZM10.5 3H13V13H10.5V3Z" />
+              </svg>
+            </button>
+          </div>
+          <div class="hud-meta">
+            <span id="hud-shot">SHOT 01/06</span>
+            <span id="hud-time">00:00 / 01:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

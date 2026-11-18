@@ -76,3 +76,22 @@ Every build folder:
 - `spaceship-structure-rerun-20261103T104124`: `stage1-haiku-on-structure`
 - `spaceship-structure-rerun2-20261103T114404`: `stage1-haiku-on-structure`
 - `spaceship-structure-rerun3-20261103T123038`: `stage1-haiku-on-structure`
+
+## island/ and train/
+
+Two short cinematic tests from 2026-11-18 and 2026-11-19. Seven models got the same prompt (`island/PROMPT.txt`, `train/PROMPT.txt`), one run each, from an empty folder, with Moru Core on. The folders are the models' output, kept byte-for-byte; only tool state (`.moru`) and run logs were left out. Every build exposes `window.__scene.seek(t)`, so the same moment can be rendered in all of them.
+
+- `island/`: a 60-second tropical island time-lapse, late afternoon to a starry night. Reasoning effort medium, 30-minute limit.
+- `train/`: an armored train crossing a frozen city on a fixed timetable (station stop at 30-34 s, tunnel at 40-46 s, bridge from 46 s). Reasoning effort high, 60-minute limit. All seven passed an automated timetable check through `window.__scene.train`.
+
+| Folder | Model |
+|---|---|
+| `fable` | Claude Fable 5.2 |
+| `opus` | Claude Opus 5.5 |
+| `astra` | GPT-6.2 Astra |
+| `sol62` | GPT-6.2 Sol |
+| `neon` | Gemini 4 Neon (run on 2026-11-19) |
+| `carbon` | Gemini 4 Carbon |
+| `hydrogen` | Gemini 4 Hydrogen |
+
+In `island/`, Fable and Carbon hit the 30-minute limit and stopped while polishing. In `train/`, Opus hit the 60-minute limit, and Fable's run was paused by a usage limit after 54m34s and resumed for the remaining minutes. `train/astra/lib/` holds the Three.js build that model bundled, with its license. One run per model, so treat these as a reference, not a ranking.

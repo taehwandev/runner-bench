@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <title>The Winter Line — armoured train at dusk</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <main id="stage" aria-label="The Winter Line, a 60 second film">
+    <canvas id="view" aria-hidden="true"></canvas>
+
+    <div id="hud" class="hud" hidden>
+      <div class="hud-info">
+        <span id="shot-label" class="shot-label"></span>
+        <span id="clock" class="clock" aria-label="Elapsed time"></span>
+      </div>
+      <div id="progress" class="progress" role="progressbar" aria-label="Film progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0">
+        <div id="progress-fill" class="progress-fill"></div>
+        <div id="progress-ticks" class="progress-ticks"></div>
+      </div>
+      <div class="hud-buttons">
+        <button id="btn-play" type="button" class="icon-button" aria-label="Pause">
+          <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+        </button>
+        <button id="btn-next" type="button" class="icon-button" aria-label="Skip to next shot">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.6v12.8a1 1 0 0 0 1.55.83L15 13.6v4.9a1 1 0 0 0 1 1h1.5a1 1 0 0 0 1-1v-13a1 1 0 0 0-1-1H16a1 1 0 0 0-1 1v4.9L6.55 4.77A1 1 0 0 0 5 5.6z"/></svg>
+        </button>
+        <button id="btn-mute" type="button" class="icon-button" aria-label="Mute sound" aria-pressed="false">
+          <svg class="icon icon-sound" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5a1 1 0 0 0 1 1h3l4.3 3.6a1 1 0 0 0 1.7-.77V5.67a1 1 0 0 0-1.7-.77L8 8.5H5a1 1 0 0 0-1 1z"/><path class="waves" d="M16.5 8.5a5 5 0 0 1 0 7M18.8 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="slash" d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="paused-chip" class="chip" hidden>Paused</div>
+
+    <section id="overlay-start" class="overlay">
+      <p class="kicker">A 60-second film</p>
+      <h1>The Winter Line</h1>
+      <p class="lede">An armoured train crosses a frozen city at dusk.</p>
+      <button id="btn-start" type="button" class="primary" disabled>Loading…</button>
+      <p class="hint">Tap or Space: pause · Swipe or →: next shot · M: mute</p>
+      <p id="load-error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section id="overlay-end" class="overlay overlay-end" hidden>
+      <p class="kicker">End of the line</p>
+      <button id="btn-replay" type="button" class="primary">Replay</button>
+    </section>
+  </main>
+  <script type="module" src="js/main.js" onerror="var e=document.getElementById('load-error');e.textContent='Could not load the 3D engine. Check the network connection and reload.';e.hidden=false;document.getElementById('btn-start').textContent='Unavailable'"></script>
+</body>
+</html>

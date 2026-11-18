@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1016"><title>Night Meridian — A railway short</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main id="screen" aria-label="Night Meridian, a one-minute animated railway film">
+  <canvas id="film" aria-label="An armored train crosses a frozen city at dusk"></canvas>
+  <div class="matte"></div>
+  <header id="credits">
+    <p class="kicker"><span class="emblem" aria-hidden="true">✦</span> A railway short</p>
+    <h1>Night<br><i>Meridian</i></h1>
+  </header>
+  <div id="posterControls">
+    <div class="posterRow">
+      <button id="start" disabled><span class="playIcon" aria-hidden="true"></span><span id="startText">Loading</span></button>
+      <span class="runtime">01<span>:</span>00</span>
+    </div>
+  </div>
+  <div id="transport" hidden>
+    <div class="cue"><span id="chapter"></span><span id="time"></span></div>
+    <div class="transportRow">
+      <button class="icon" id="pause" aria-label="Pause film"><span></span></button>
+      <input id="scrub" type="range" min="0" max="60" step=".01" value="0" aria-label="Film position in seconds">
+      <button id="next" class="icon" aria-label="Skip to next shot"><span class="nextIcon"></span></button>
+      <button id="sound" class="icon" aria-label="Mute sound" aria-pressed="false"><span class="bars"><b></b><b></b><b></b><b></b></span></button>
+    </div>
+  </div>
+  <p id="notice" role="status"></p>
+</main>
+<script type="module" src="./film.js"></script>
+</body></html>
+

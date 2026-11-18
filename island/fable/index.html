@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>Last Light — a 60-second island time-lapse</title>
+<link rel="stylesheet" href="./css/style.css">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+</head>
+<body>
+<main id="stage">
+  <canvas id="view" aria-label="Time-lapse of a tropical island from late afternoon to night"></canvas>
+  <div id="vignette" aria-hidden="true"></div>
+  <div id="fade" aria-hidden="true"></div>
+
+  <div id="hud" hidden>
+    <div id="track" aria-hidden="true"><div id="bar"></div></div>
+    <div id="buttons">
+      <button id="btnPause" type="button" aria-label="Pause" data-icon="pause"><span class="ico"></span></button>
+      <button id="btnNext" type="button" aria-label="Skip to next shot" data-icon="next"><span class="ico"></span></button>
+    </div>
+  </div>
+
+  <section id="start" class="card">
+    <p class="kicker">A 60-second time-lapse</p>
+    <h1>Last Light</h1>
+    <p class="sub">Late afternoon to a starry night, on one small island.</p>
+    <button id="btnStart" type="button" class="cta" disabled>Start</button>
+    <p id="startNote" class="note">Sound on · Tap or Space to pause · Swipe or → for the next shot</p>
+  </section>
+
+  <section id="end" class="card" hidden>
+    <h1>Last Light</h1>
+    <button id="btnReplay" type="button" class="cta">Replay</button>
+  </section>
+</main>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
